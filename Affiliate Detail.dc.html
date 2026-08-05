@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5f7;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#111a26;-webkit-font-smoothing:antialiased}
+a{color:#1d6fe0;text-decoration:none}
+a:hover{color:#1558b0;text-decoration:underline}
+::-webkit-scrollbar{height:10px;width:10px}
+::-webkit-scrollbar-thumb{background:#ccd4dc;border-radius:6px;border:2px solid #f3f5f7}
+</style></helmet>
+<div style="display:flex;min-height:100vh;min-width:1240px;font-size:13px">
+
+<nav style="width:72px;flex:none;background:#0f1622;display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:2px">
+<div style="width:32px;height:32px;border-radius:9px;background:#17a34a;display:flex;align-items:center;justify-content:center;font:700 13px ui-monospace,Menlo,monospace;color:#06210f;margin-bottom:14px">AV</div>
+<a href="#" style="width:58px;padding:8px 0;border-radius:8px;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8b98a8" style-hover="background:#18212f;color:#e9eef4"><span style="width:15px;height:15px;border:1.5px solid currentColor;border-radius:3px"></span><span style="font-size:9.5px">Home</span></a>
+<a href="#" style="width:58px;padding:8px 0;border-radius:8px;display:flex;flex-direction:column;align-items:center;gap:5px;background:#15271c;color:#5fd68d;box-shadow:inset 2px 0 0 #17a34a"><span style="width:15px;height:15px;border:1.5px solid currentColor;border-radius:50%"></span><span style="font-size:9.5px">Affiliates</span></a>
+<a href="#" style="width:58px;padding:8px 0;border-radius:8px;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8b98a8" style-hover="background:#18212f;color:#e9eef4"><span style="width:15px;height:15px;border:1.5px solid currentColor;border-radius:3px 3px 8px 3px"></span><span style="font-size:9.5px">Customers</span></a>
+<a href="#" style="width:58px;padding:8px 0;border-radius:8px;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8b98a8" style-hover="background:#18212f;color:#e9eef4"><span style="width:15px;height:15px;border:1.5px solid currentColor;transform:rotate(45deg)"></span><span style="font-size:9.5px">Payouts</span></a>
+<a href="#" style="width:58px;padding:8px 0;border-radius:8px;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8b98a8" style-hover="background:#18212f;color:#e9eef4"><span style="width:15px;height:15px;border:1.5px solid currentColor;border-radius:3px;border-left-width:5px"></span><span style="font-size:9.5px">Reports</span></a>
+<div style="flex:1"></div>
+<div style="width:28px;height:28px;border-radius:50%;background:#28374b;color:#cbd6e2;display:flex;align-items:center;justify-content:center;font:600 10.5px 'Helvetica Neue',Helvetica,sans-serif">BR</div>
+</nav>
+
+<div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+<header style="flex:none;background:#fff;border-bottom:1px solid #e4e8ed;padding:0 26px;display:flex;align-items:center;gap:26px;height:52px">
+<span style="font:600 15px 'Helvetica Neue',Helvetica,sans-serif">Affiliate Manager</span>
+<div style="display:flex;gap:20px;font-size:13px;color:#5b6673">
+<a href="#" style="color:#5b6673;padding:16px 0">Dashboard</a>
+<a href="#" style="color:#5b6673;padding:16px 0">Campaigns</a>
+<button onClick="{{ goDetail }}" style="border:0;background:none;padding:16px 0;font:600 13px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer;color:{{ navAffFg }};box-shadow:{{ navAffLine }}">Affiliates</button>
+<button onClick="{{ goPayout }}" style="border:0;background:none;padding:16px 0;font:600 13px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer;color:{{ navPayFg }};box-shadow:{{ navPayLine }}">Payouts</button>
+<button onClick="{{ goEmpty }}" style="border:0;background:none;padding:16px 0;font:600 13px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer;color:{{ navEmpFg }};box-shadow:{{ navEmpLine }}">Sync status</button>
+<a href="#" style="color:#5b6673;padding:16px 0">Settings</a>
+</div>
+<div style="flex:1"></div>
+<div style="font-size:11.5px;color:#6b7684">Last sync <span style="color:#111a26;font-weight:600">12 min ago</span></div>
+</header>
+
+<main style="flex:1;padding:22px 26px 64px">
+
+<sc-if value="{{ isDetail }}" hint-placeholder-val="{{ true }}">
+<div style="max-width:1520px;margin:0 auto;display:flex;flex-direction:column;gap:14px">
+
+<a href="#" style="font-size:12.5px;font-weight:600">← Back to Affiliates</a>
+
+<div style="display:grid;grid-template-columns:390px 1fr;gap:14px;align-items:stretch">
+
+<section style="background:#fff;border:1px solid #e4e8ed;border-radius:10px;padding:18px 20px">
+<div style="display:flex;align-items:flex-start;gap:12px">
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+<h1 style="margin:0;font:600 19px/1.2 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:-.01em">Northlake Dental</h1>
+<span style="font:600 10.5px ui-monospace,Menlo,monospace;color:#5b6673;background:#f1f4f6;border-radius:5px;padding:3px 6px">NLDP-04</span>
+</div>
+<div style="margin-top:9px;display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:#3f4a58">
+<div>Dana Whitfield · <a href="#">dana@northlakedental.com</a></div>
+<div style="color:#6b7684">(863) 555-0148</div>
+</div>
+</div>
+<div style="display:flex;gap:6px;flex:none">
+<button style="width:28px;height:28px;border:1px solid #dde3e9;border-radius:6px;background:#fff;color:#6b7684;cursor:pointer" style-hover="border-color:#17a34a">✎</button>
+<button style="width:28px;height:28px;border:1px solid #dde3e9;border-radius:6px;background:#fff;color:#6b7684;cursor:pointer;font-weight:700" style-hover="border-color:#17a34a">⋮</button>
+</div>
+</div>
+<div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:9px 14px;padding-top:14px;border-top:1px solid #eef1f4">
+<div><div style="font:600 9.5px 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#98a3af">Status</div><div style="margin-top:3px;display:flex;align-items:center;gap:5px;font-size:12.5px"><span style="width:6px;height:6px;border-radius:50%;background:#17a34a"></span>Active</div></div>
+<div><div style="font:600 9.5px 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#98a3af">GoHighLevel</div><div style="margin-top:3px;font-size:12.5px">Connected</div></div>
+<div><div style="font:600 9.5px 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#98a3af">W-9</div><div style="margin-top:3px;font-size:12.5px">On file · TY2025</div></div>
+<div><div style="font:600 9.5px 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#98a3af">Start date</div><div style="margin-top:3px;font-size:12.5px">Sep 3, 2025</div></div>
+</div>
+<div style="margin-top:14px;display:flex;flex-direction:column;gap:7px">
+<button onClick="{{ goPayout }}" style="border:0;background:#17a34a;color:#fff;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;padding:9px 12px;border-radius:7px;cursor:pointer;display:flex;justify-content:space-between;align-items:center" style-hover="background:#128a3f">Review Open Items<span style="background:#0f7a37;border-radius:20px;padding:1px 7px;font-size:11px">4</span></button>
+<div style="display:flex;gap:7px">
+<button onClick="{{ goPayout }}" style="flex:1;border:1px solid #dde3e9;background:#fff;font:600 12px 'Helvetica Neue',Helvetica,sans-serif;padding:8px 6px;border-radius:7px;cursor:pointer" style-hover="border-color:#17a34a">Current Payout</button>
+<button style="flex:1;border:1px solid #dde3e9;background:#fff;font:600 12px 'Helvetica Neue',Helvetica,sans-serif;padding:8px 6px;border-radius:7px;cursor:pointer" style-hover="border-color:#17a34a">Statement</button>
+<button style="flex:1;border:1px solid #dde3e9;background:#fff;font:600 12px 'Helvetica Neue',Helvetica,sans-serif;padding:8px 6px;border-radius:7px;cursor:pointer" style-hover="border-color:#17a34a">Sync</button>
+</div>
+</div>
+</section>
+
+<section style="background:#fff;border:1px solid #e4e8ed;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+<h2 style="margin:0;font:600 14px 'Helvetica Neue',Helvetica,sans-serif">Affiliate Stats</h2>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;gap:7px;border:1px solid #dde3e9;border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer" style-hover="border-color:#17a34a"><span style="color:#6b7684">Range</span><span style="font-weight:600">07/06/2026 → 08/05/2026</span></div>
+<div style="display:flex;align-items:center;gap:7px;border:1px solid #dde3e9;border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer" style-hover="border-color:#17a34a"><span style="color:#6b7684">Sale month</span><span style="font-weight:600">Jul 2026</span></div>
+<div style="display:flex;align-items:center;gap:7px;border:1px solid #dde3e9;border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer" style-hover="border-color:#17a34a"><span style="color:#6b7684">Campaign</span><span style="font-weight:600">All Campaigns</span></div>
+</div>
+
+<div style="margin-top:18px;display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#eef1f4;border:1px solid #eef1f4;border-radius:9px;overflow:hidden;flex:1">
+<div style="background:#fff;padding:14px 15px">
+<div style="display:flex;align-items:center;gap:5px"><span style="font-size:11.5px;color:#6b7684">Eligible Gross Sales</span><span title="Gross CardPointe sales from referred customers inside their active 12-month attribution window." style="width:13px;height:13px;border:1px solid #c7d0d8;border-radius:50%;color:#98a3af;font:600 9px/11px 'Helvetica Neue',Helvetica,sans-serif;text-align:center;cursor:help">i</span></div>
+<div style="margin-top:7px;font:600 24px/1.1 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:-.02em">$486,204</div>
+<div style="margin-top:4px;font-size:11px;color:#8c96a2">Selected period</div>
+<div style="margin-top:6px;font:600 11px 'Helvetica Neue',Helvetica,sans-serif;color:#0f5c2e">▲ 8.4% <span style="font-weight:400;color:#8c96a2">vs prior 30d</span></div>
+</div>
+<div style="background:#fff;padding:14px 15px">
+<div style="display:flex;align-items:center;gap:5px"><span style="font-size:11.5px;color:#6b7684">Estimated Commission</span><span title="Commission calculated from eligible sales in a month that is still open and may change." style="width:13px;height:13px;border:1px solid #c7d0d8;border-radius:50%;color:#98a3af;font:600 9px/11px 'Helvetica Neue',Helvetica,sans-serif;text-align:center;cursor:help">i</span></div>
+<div style="margin-top:7px;font:600 24px/1.1 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:-.02em">$14,586</div>
+<div style="margin-top:4px;font-size:11px;color:#8c96a2">Aug 2026 · month open</div>
+<div style="margin-top:6px;font-size:11px;color:#8c96a2">Tier 3 · 3.0%</div>
+</div>
+<div style="background:#fff;padding:14px 15px">
+<div style="display:flex;align-items:center;gap:5px"><span style="font-size:11.5px;color:#6b7684">Approved and Owed</span><span title="The payout has been reviewed and approved but has not been paid." style="width:13px;height:13px;border:1px solid #c7d0d8;border-radius:50%;color:#98a3af;font:600 9px/11px 'Helvetica Neue',Helvetica,sans-serif;text-align:center;cursor:help">i</span></div>
+<div style="margin-top:7px;font:600 24px/1.1 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:-.02em">$9,842</div>
+<div style="margin-top:4px;font-size:11px;color:#8c96a2">As of today · 2 records</div>
+<a href="#" onClick="{{ goPayout }}" style="display:inline-block;margin-top:6px;font-size:11.5px">Review payout</a>
+</div>
+<div style="background:#fff;padding:14px 15px">
+<div style="display:flex;align-items:center;gap:5px"><span style="font-size:11.5px;color:#6b7684">Paid</span><span title="A completed payment has been recorded." style="width:13px;height:13px;border:1px solid #c7d0d8;border-radius:50%;color:#98a3af;font:600 9px/11px 'Helvetica Neue',Helvetica,sans-serif;text-align:center;cursor:help">i</span></div>
+<div style="margin-top:7px;font:600 24px/1.1 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:-.02em">$128,470</div>
+<div style="margin-top:4px;font-size:11px;color:#8c96a2">Year to date · 11 payments</div>
+<div style="margin-top:6px;font-size:11px;color:#8c96a2">Lifetime $214,905</div>
+</div>
+<div style="background:#fff;padding:14px 15px">
+<div style="display:flex;align-items:center;gap:5px"><span style="font-size:11.5px;color:#6b7684">Active Referred Customers</span><span title="Referred customers whose 12-month attribution window is still open today." style="width:13px;height:13px;border:1px solid #c7d0d8;border-radius:50%;color:#98a3af;font:600 9px/11px 'Helvetica Neue',Helvetica,sans-serif;text-align:center;cursor:help">i</span></div>
+<div style="margin-top:7px;font:600 24px/1.1 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:-.02em">34<span style="font-size:13px;font-weight:400;color:#8c96a2"> / 61 lifetime</span></div>
+<div style="margin-top:4px;font-size:11px;color:#8c96a2">As of Aug 5, 2026</div>
+<div style="margin-top:6px;font:600 11px 'Helvetica Neue',Helvetica,sans-serif;color:#8a5a06">6 expiring in 60 days</div>
+</div>
+</div>
+</section>
+</div>
+
+<section style="background:#fff;border:1px solid #e4e8ed;border-radius:10px">
+<div style="display:flex;gap:22px;padding:0 20px;border-bottom:1px solid #eef1f4">
+<span style="padding:13px 0;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;color:#111a26;box-shadow:inset 0 -2px 0 #17a34a">All Campaigns</span>
+<span style="padding:13px 0;font-size:12.5px;color:#6b7684;cursor:pointer">Local Business Partners</span>
+<span style="padding:13px 0;font-size:12.5px;color:#6b7684;cursor:pointer">Practice Referral Network</span>
+</div>
+<div style="padding:18px 20px">
+<div style="display:flex;align-items:baseline;gap:10px">
+<h2 style="margin:0;font:600 14px 'Helvetica Neue',Helvetica,sans-serif">Payout lifecycle</h2>
+<span style="font-size:11.5px;color:#8c96a2">Mutually exclusive stages — a dollar sits in exactly one bucket, so these do not sum to a total.</span>
+</div>
+<div style="margin-top:14px;display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:#eef1f4;border:1px solid #eef1f4;border-radius:9px;overflow:hidden">
+<div style="background:#fbfcfd;padding:13px 14px;border-top:3px solid #b6c0cb">
+<div style="font:600 11px 'Helvetica Neue',Helvetica,sans-serif;color:#5b6673">Estimated Commission</div>
+<div style="margin-top:6px;font:600 18px 'Helvetica Neue',Helvetica,sans-serif">$14,586</div>
+<div style="margin-top:3px;font-size:11px;color:#8c96a2">62 commission items · open month</div>
+</div>
+<div style="background:#fbfcfd;padding:13px 14px;border-top:3px solid #e0a92b">
+<div style="font:600 11px 'Helvetica Neue',Helvetica,sans-serif;color:#5b6673">Pending Review</div>
+<div style="margin-top:6px;font:600 18px 'Helvetica Neue',Helvetica,sans-serif">$4,120</div>
+<div style="margin-top:3px;font-size:11px;color:#8c96a2">1 payout · 4 exceptions</div>
+<a href="#" onClick="{{ goPayout }}" style="display:inline-block;margin-top:5px;font-size:11px">Resolve</a>
+</div>
+<div style="background:#fbfcfd;padding:13px 14px;border-top:3px solid #17a34a">
+<div style="font:600 11px 'Helvetica Neue',Helvetica,sans-serif;color:#5b6673">Approved and Owed</div>
+<div style="margin-top:6px;font:600 18px 'Helvetica Neue',Helvetica,sans-serif">$9,842</div>
+<div style="margin-top:3px;font-size:11px;color:#8c96a2">2 payouts</div>
+</div>
+<div style="background:#fbfcfd;padding:13px 14px;border-top:3px solid #1d6fe0">
+<div style="font:600 11px 'Helvetica Neue',Helvetica,sans-serif;color:#5b6673">Scheduled Payment</div>
+<div style="margin-top:6px;font:600 18px 'Helvetica Neue',Helvetica,sans-serif">$6,310</div>
+<div style="margin-top:3px;font-size:11px;color:#8c96a2">1 payout · batch Aug 15</div>
+</div>
+<div style="background:#fbfcfd;padding:13px 14px;border-top:3px solid #0f5c2e">
+<div style="font:600 11px 'Helvetica Neue',Helvetica,sans-serif;color:#5b6673">Paid</div>
+<div style="margin-top:6px;font:600 18px 'Helvetica Neue',Helvetica,sans-serif">$128,470</div>
+<div style="margin-top:3px;font-size:11px;color:#8c96a2">11 payments · YTD</div>
+</div>
+<div style="background:#fbfcfd;padding:13px 14px;border-top:3px solid #7c5cd6">
+<div style="font:600 11px 'Helvetica Neue',Helvetica,sans-serif;color:#5b6673">Held · Adjustments</div>
+<div style="margin-top:6px;font:600 18px 'Helvetica Neue',Helvetica,sans-serif">$1,480 <span style="font-size:12px;font-weight:400;color:#8c96a2">held</span></div>
+<div style="margin-top:3px;font-size:11px;color:#8c96a2">1 payout held · −$612 adjustments</div>
+</div>
+</div>
+<div style="margin-top:11px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:#6b7684;flex-wrap:wrap">
+<span style="font-weight:600;color:#111a26">Estimated</span><span style="color:#b6c0cb">→</span>
+<span style="font-weight:600;color:#111a26">Pending Review</span><span style="color:#b6c0cb">→</span>
+<span style="font-weight:600;color:#111a26">Approved and Owed</span><span style="color:#b6c0cb">→</span>
+<span style="font-weight:600;color:#111a26">Scheduled</span><span style="color:#b6c0cb">→</span>
+<span style="font-weight:600;color:#111a26">Paid</span>
+<span style="margin-left:8px;padding:2px 8px;border:1px dashed #cfd6de;border-radius:20px;color:#5b6673">Held branches from Pending Review or Approved</span>
+</div>
+</div>
+</section>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+<section style="background:#fff;border:1px solid #e4e8ed;border-radius:10px;padding:16px 18px">
+<div style="display:flex;align-items:baseline;gap:8px"><h2 style="margin:0;font:600 13.5px 'Helvetica Neue',Helvetica,sans-serif">Eligible Revenue Over Time</h2><span style="font-size:11px;color:#8c96a2">Aug 2025 – Jul 2026 · monthly</span></div>
+<div style="margin-top:12px;display:flex;align-items:flex-end;gap:10px;height:150px;padding-left:34px;position:relative">
+<div style="position:absolute;left:0;top:0;bottom:18px;width:32px;display:flex;flex-direction:column;justify-content:space-between;font-size:10px;color:#a6b0bb;text-align:right"><span>$600k</span><span>$300k</span><span>$0</span></div>
+<sc-for list="{{ revBars }}" as="b" hint-placeholder-count="12">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end" title="{{ b.tip }}">
+<div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:100%;position:relative">
+<div style="height:{{ b.excl }};background:#e6e9ee;border-radius:2px 2px 0 0"></div>
+<div style="height:{{ b.gross }};background:#17a34a;opacity:.85"></div>
+<div style="position:absolute;left:-2px;right:-2px;bottom:{{ b.comm }};height:2px;background:#7c5cd6;border-radius:2px"></div>
+</div>
+<span style="font-size:9.5px;color:#a6b0bb">{{ b.label }}</span>
+</div>
+</sc-for>
+</div>
+<div style="margin-top:8px;display:flex;gap:14px;font-size:11px;color:#5b6673">
+<span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:#17a34a"></span>Eligible gross</span>
+<span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:#e6e9ee"></span>Excluded gross</span>
+<span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:#7c5cd6"></span>Commission earned</span>
+</div>
+</section>
+<section style="background:#fff;border:1px solid #e4e8ed;border-radius:10px;padding:16px 18px">
+<div style="display:flex;align-items:baseline;gap:8px"><h2 style="margin:0;font:600 13.5px 'Helvetica Neue',Helvetica,sans-serif">Customer Value During Attribution Window</h2><span style="font-size:11px;color:#8c96a2">Cumulative, 34 active customers</span></div>
+<div style="margin-top:12px;display:flex;align-items:flex-end;gap:0;height:150px;padding-left:34px;position:relative">
+<div style="position:absolute;left:0;top:0;bottom:18px;width:32px;display:flex;flex-direction:column;justify-content:space-between;font-size:10px;color:#a6b0bb;text-align:right"><span>$16k</span><span>$8k</span><span>$0</span></div>
+<sc-for list="{{ lifeBars }}" as="p" hint-placeholder-count="6">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end">
+<span style="font:600 10px 'Helvetica Neue',Helvetica,sans-serif;color:#5b6673">{{ p.value }}</span>
+<div style="width:60%;height:{{ p.h }};background:#7c5cd6;opacity:.75;border-radius:3px 3px 0 0"></div>
+<span style="font-size:9.5px;color:#a6b0bb;text-align:center">{{ p.label }}</span>
+</div>
+</sc-for>
+</div>
+<div style="margin-top:8px;font-size:11px;color:#8c96a2">Average cumulative eligible revenue per referred customer, measured from first eligible sale.</div>
+</section>
+</div>
+
+<section style="background:#fff;border:1px solid #e4e8ed;border-radius:10px">
+<div style="display:flex;gap:22px;padding:0 20px;border-bottom:1px solid #eef1f4;align-items:center">
+<button onClick="{{ tabCustomers }}" style="border:0;background:none;padding:14px 0;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer;color:{{ tCustFg }};box-shadow:{{ tCustLine }}">Referred Customers <span style="font-weight:400;color:#98a3af">61</span></button>
+<button onClick="{{ tabCommissions }}" style="border:0;background:none;padding:14px 0;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer;color:{{ tCommFg }};box-shadow:{{ tCommLine }}">Commissions <span style="font-weight:400;color:#98a3af">62</span></button>
+<button onClick="{{ tabPayouts }}" style="border:0;background:none;padding:14px 0;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer;color:{{ tPayFg }};box-shadow:{{ tPayLine }}">Payouts <span style="font-weight:400;color:#98a3af">12</span></button>
+<button onClick="{{ tabCampaigns }}" style="border:0;background:none;padding:14px 0;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer;color:{{ tCampFg }};box-shadow:{{ tCampLine }}">Campaign Attribution</button>
+<button onClick="{{ tabAudit }}" style="border:0;background:none;padding:14px 0;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer;color:{{ tAudFg }};box-shadow:{{ tAudLine }}">Audit History</button>
+</div>
+
+<sc-if value="{{ isCustomers }}" hint-placeholder-val="{{ true }}">
+<div style="padding:13px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid #eef1f4">
+<div style="display:flex;align-items:center;gap:7px;border:1px solid #dde3e9;border-radius:7px;padding:6px 10px;width:270px;background:#fff">
+<span style="width:11px;height:11px;border:1.5px solid #a6b0bb;border-radius:50%"></span>
+<input placeholder="Search customer name or ID" style="border:0;outline:none;font:400 12px 'Helvetica Neue',Helvetica,sans-serif;width:100%;background:none" />
+</div>
+<select style="border:1px solid #dde3e9;border-radius:7px;padding:6px 9px;font:400 12px 'Helvetica Neue',Helvetica,sans-serif;background:#fff;color:#3f4a58"><option>Lifecycle: All</option><option>Active</option><option>Expiring Soon</option><option>Awaiting First Sale</option><option>Attribution Conflict</option></select>
+<select style="border:1px solid #dde3e9;border-radius:7px;padding:6px 9px;font:400 12px 'Helvetica Neue',Helvetica,sans-serif;background:#fff;color:#3f4a58"><option>Campaign: All</option><option>Local Business Partners</option></select>
+<select style="border:1px solid #dde3e9;border-radius:7px;padding:6px 9px;font:400 12px 'Helvetica Neue',Helvetica,sans-serif;background:#fff;color:#3f4a58"><option>Location: All</option><option>Lakeland</option><option>Winter Haven</option></select>
+<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#3f4a58;border:1px solid #dde3e9;border-radius:7px;padding:6px 10px;cursor:pointer"><input type="checkbox" style="margin:0" />Expiring soon only</label>
+<div style="flex:1"></div>
+<button style="border:1px solid #dde3e9;background:#fff;border-radius:7px;padding:6px 11px;font:600 12px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer" style-hover="border-color:#17a34a">Manage Columns</button>
+<button style="border:1px solid #dde3e9;background:#fff;border-radius:7px;padding:6px 11px;font:600 12px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer" style-hover="border-color:#17a34a">Export CSV</button>
+</div>
+<div style="overflow-x:auto">
+<table style="border-collapse:collapse;width:100%;min-width:1500px;font-size:12.5px">
+<thead>
+<tr style="background:#fafbfc;color:#5b6673;text-align:left">
+<th style="position:sticky;left:0;background:#fafbfc;padding:9px 14px;font-weight:600;border-bottom:1px solid #e4e8ed;min-width:210px;box-shadow:1px 0 0 #e4e8ed">Customer</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Lifecycle</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Campaign</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Landing page</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">First referral</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">First eligible sale</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;min-width:190px">Attribution window</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Eligible gross</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Estimated</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Approved</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Paid</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Last sale</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Location</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Match</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;min-width:150px">Action required</th>
+</tr>
+</thead>
+<tbody>
+<sc-for list="{{ customers }}" as="c" hint-placeholder-count="8">
+<tr onClick="{{ c.toggle }}" style="border-bottom:1px solid #f1f4f6;cursor:pointer;background:{{ c.rowBg }}" style-hover="background:#f7fafc">
+<td style="position:sticky;left:0;background:{{ c.stickyBg }};padding:10px 14px;box-shadow:1px 0 0 #e4e8ed">
+<div style="display:flex;align-items:center;gap:8px">
+<span style="width:14px;color:#a6b0bb;font-size:10px">{{ c.caret }}</span>
+<div><a href="#" style="font-weight:600">{{ c.name }}</a><div style="font-size:11px;color:#8c96a2">{{ c.id }}</div></div>
+</div>
+</td>
+<td style="padding:10px 12px"><span style="font:600 10.5px 'Helvetica Neue',Helvetica,sans-serif;padding:3px 8px;border-radius:20px;background:{{ c.badgeBg }};color:{{ c.badgeFg }};border:1px solid {{ c.badgeBd }};white-space:nowrap">{{ c.status }}</span></td>
+<td style="padding:10px 12px;color:#3f4a58">{{ c.campaign }}</td>
+<td style="padding:10px 12px;color:#3f4a58">{{ c.funnel }}</td>
+<td style="padding:10px 12px;color:#3f4a58">{{ c.firstRef }}</td>
+<td style="padding:10px 12px;color:#3f4a58">{{ c.firstSale }}</td>
+<td style="padding:10px 12px">
+<div style="font-size:11.5px;color:#3f4a58">{{ c.windowText }}</div>
+<div style="margin-top:4px;height:4px;border-radius:3px;background:#eef1f4"><div style="height:4px;border-radius:3px;background:{{ c.barColor }};width:{{ c.pct }}"></div></div>
+<div style="margin-top:3px;font-size:10.5px;color:#8c96a2">{{ c.pctText }}</div>
+</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums">{{ c.gross }}</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums">{{ c.est }}</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums">{{ c.appr }}</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums">{{ c.paid }}</td>
+<td style="padding:10px 12px;color:#3f4a58">{{ c.lastSale }}</td>
+<td style="padding:10px 12px;color:#3f4a58">{{ c.location }}</td>
+<td style="padding:10px 12px;color:{{ c.matchFg }}">{{ c.match }}</td>
+<td style="padding:10px 12px">{{ c.actionCell }}</td>
+</tr>
+<sc-if value="{{ c.open }}" hint-placeholder-val="{{ false }}">
+<tr style="background:#fafbfc;border-bottom:1px solid #eef1f4">
+<td colspan="15" style="padding:0">
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:16px 20px 16px 48px">
+<div>
+<div style="font:600 9.5px 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#98a3af">Attribution source</div>
+<div style="margin-top:6px;font-size:12px;line-height:1.7;color:#3f4a58">GoHighLevel contact <a href="#">GHL-88421</a><br />Campaign: Local Business Partners<br />Funnel: /new-patient-offer<br />utm_source=partner · utm_medium=referral<br />utm_campaign=nldp-summer26</div>
+</div>
+<div>
+<div style="font:600 9.5px 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#98a3af">Identity match</div>
+<div style="margin-top:6px;font-size:12px;line-height:1.7;color:#3f4a58">Practice Fusion match: <span style="color:#0f5c2e;font-weight:600">Confirmed</span><br />Matched on name + phone + DOB<br />Reviewed by Brittany R. · Jul 12, 2026</div>
+</div>
+<div>
+<div style="font:600 9.5px 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#98a3af">Window</div>
+<div style="margin-top:6px;font-size:12px;line-height:1.7;color:#3f4a58">First eligible CardPointe sale: Mar 15, 2026<br />Attribution start: Mar 15, 2026<br />Expires: Mar 15, 2027<br />Eligible sales in window: 9</div>
+</div>
+<div>
+<div style="font:600 9.5px 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#98a3af">Contribution</div>
+<div style="margin-top:6px;font-size:12px;line-height:1.7;color:#3f4a58">Eligible gross in window: $41,280<br />Commission contribution: $1,238<br />Latest transaction: Aug 2, 2026 · $3,140<br />Excluded transactions: 2 · $980 <a href="#">View</a></div>
+</div>
+</div>
+</td>
+</tr>
+</sc-if>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="display:flex;align-items:center;gap:12px;padding:11px 20px;font-size:12px;color:#6b7684">
+<span>Rows per page</span>
+<select style="border:1px solid #dde3e9;border-radius:6px;padding:3px 6px;font-size:12px"><option>10</option><option>25</option><option>50</option></select>
+<span>1 – 8 of 61</span>
+<div style="flex:1"></div>
+<button style="border:1px solid #dde3e9;background:#fff;border-radius:6px;padding:5px 10px;font-size:12px;color:#a6b0bb">Previous</button>
+<button style="border:1px solid #1d6fe0;background:#fff;border-radius:6px;padding:5px 10px;font-size:12px;color:#1d6fe0;font-weight:600">1</button>
+<button style="border:1px solid #dde3e9;background:#fff;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer">Next</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ isCommissions }}" hint-placeholder-val="{{ false }}">
+<div style="padding:13px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid #eef1f4">
+<div style="display:flex;align-items:center;gap:7px;border:1px solid #dde3e9;border-radius:7px;padding:6px 10px;width:270px;background:#fff">
+<span style="width:11px;height:11px;border:1.5px solid #a6b0bb;border-radius:50%"></span>
+<input placeholder="Search customer or CardPointe txn" style="border:0;outline:none;font:400 12px 'Helvetica Neue',Helvetica,sans-serif;width:100%;background:none" />
+</div>
+<select style="border:1px solid #dde3e9;border-radius:7px;padding:6px 9px;font:400 12px 'Helvetica Neue',Helvetica,sans-serif;background:#fff;color:#3f4a58"><option>Sale month: last 6</option><option>Aug 2026</option><option>Jul 2026</option><option>Jun 2026</option></select>
+<select style="border:1px solid #dde3e9;border-radius:7px;padding:6px 9px;font:400 12px 'Helvetica Neue',Helvetica,sans-serif;background:#fff;color:#3f4a58"><option>Payout status: All</option><option>Estimated Commission</option><option>Pending Review</option><option>Approved and Owed</option><option>Scheduled Payment</option><option>Paid</option><option>Held</option></select>
+<select style="border:1px solid #dde3e9;border-radius:7px;padding:6px 9px;font:400 12px 'Helvetica Neue',Helvetica,sans-serif;background:#fff;color:#3f4a58"><option>Eligibility: All</option><option>Eligible</option><option>Excluded</option><option>Held</option></select>
+<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#3f4a58;border:1px solid #dde3e9;border-radius:7px;padding:6px 10px;cursor:pointer"><input type="checkbox" style="margin:0" />Adjusted items only</label>
+<div style="flex:1"></div>
+<button style="border:1px solid #dde3e9;background:#fff;border-radius:7px;padding:6px 11px;font:600 12px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer" style-hover="border-color:#17a34a">Manage Columns</button>
+<button style="border:1px solid #dde3e9;background:#fff;border-radius:7px;padding:6px 11px;font:600 12px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer" style-hover="border-color:#17a34a">Export CSV</button>
+</div>
+<div style="overflow-x:auto">
+<table style="border-collapse:collapse;width:100%;min-width:1400px;font-size:12.5px">
+<thead><tr style="background:#fafbfc;color:#5b6673;text-align:left">
+<th style="padding:9px 14px;font-weight:600;border-bottom:1px solid #e4e8ed">Sale date</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Customer</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">CardPointe txn</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Gross</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Commissionable</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Tier</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Contribution</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Eligibility</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Payout month</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Payout status</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Adjustment</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Notes</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{ commissions }}" as="r" hint-placeholder-count="8">
+<tr onClick="{{ openDrawer }}" style="border-bottom:1px solid #f1f4f6;cursor:pointer" style-hover="background:#f7fafc">
+<td style="padding:10px 14px;color:#3f4a58">{{ r.date }}</td>
+<td style="padding:10px 12px"><a href="#">{{ r.customer }}</a></td>
+<td style="padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#3f4a58">{{ r.txn }}</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums">{{ r.gross }}</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums">{{ r.commissionable }}</td>
+<td style="padding:10px 12px;color:#3f4a58">{{ r.tier }}</td>
+<td style="padding:10px 12px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums">{{ r.contribution }}</td>
+<td style="padding:10px 12px;color:{{ r.eligFg }}">{{ r.eligibility }}</td>
+<td style="padding:10px 12px;color:#3f4a58">{{ r.month }}</td>
+<td style="padding:10px 12px"><span style="font:600 10.5px 'Helvetica Neue',Helvetica,sans-serif;padding:3px 8px;border-radius:20px;background:{{ r.badgeBg }};color:{{ r.badgeFg }};border:1px solid {{ r.badgeBd }};white-space:nowrap">{{ r.status }}</span></td>
+<td style="padding:10px 12px;color:#3f4a58">{{ r.adjustment }}</td>
+<td style="padding:10px 12px;color:#8c96a2">{{ r.notes }}</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</sc-if>
+
+<sc-if value="{{ isPayouts }}" hint-placeholder-val="{{ false }}">
+<div style="padding:13px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid #eef1f4">
+<div style="display:flex;align-items:center;gap:7px;border:1px solid #dde3e9;border-radius:7px;padding:6px 10px;font-size:12px;cursor:pointer" style-hover="border-color:#17a34a"><span style="color:#6b7684">Sale month</span><span style="font-weight:600">Mar 2026 → Aug 2026</span></div>
+<select style="border:1px solid #dde3e9;border-radius:7px;padding:6px 9px;font:400 12px 'Helvetica Neue',Helvetica,sans-serif;background:#fff;color:#3f4a58"><option>Status: All</option><option>Estimated Commission</option><option>Pending Review</option><option>Approved and Owed</option><option>Scheduled Payment</option><option>Paid</option><option>Held</option></select>
+<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#3f4a58;border:1px solid #dde3e9;border-radius:7px;padding:6px 10px;cursor:pointer"><input type="checkbox" style="margin:0" />Unpaid only</label>
+<div style="flex:1"></div>
+<button style="border:1px solid #dde3e9;background:#fff;border-radius:7px;padding:6px 11px;font:600 12px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer" style-hover="border-color:#17a34a">Export CSV</button>
+</div>
+<div style="overflow-x:auto">
+<table style="border-collapse:collapse;width:100%;min-width:1400px;font-size:12.5px">
+<thead><tr style="background:#fafbfc;color:#5b6673;text-align:left">
+<th style="padding:9px 14px;font-weight:600;border-bottom:1px solid #e4e8ed">Sale month</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Due date</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Eligible gross</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Tier</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Base commission</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Adjustments</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Final amount</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Status</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Paid date</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Reference</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;min-width:230px">Actions</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{ payouts }}" as="p" hint-placeholder-count="6">
+<tr style="border-bottom:1px solid #f1f4f6" style-hover="background:#f7fafc">
+<td style="padding:10px 14px;font-weight:600">{{ p.month }}</td>
+<td style="padding:10px 12px;color:#3f4a58">{{ p.due }}</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums">{{ p.gross }}</td>
+<td style="padding:10px 12px;color:#3f4a58">{{ p.tier }}</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums">{{ p.base }}</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums;color:{{ p.adjFg }}">{{ p.adj }}</td>
+<td style="padding:10px 12px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums">{{ p.final }}</td>
+<td style="padding:10px 12px"><span style="font:600 10.5px 'Helvetica Neue',Helvetica,sans-serif;padding:3px 8px;border-radius:20px;background:{{ p.badgeBg }};color:{{ p.badgeFg }};border:1px solid {{ p.badgeBd }};white-space:nowrap">{{ p.status }}</span></td>
+<td style="padding:10px 12px;color:#3f4a58">{{ p.paidDate }}</td>
+<td style="padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#3f4a58">{{ p.ref }}</td>
+<td style="padding:10px 12px">{{ p.actionCell }}</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</sc-if>
+
+<sc-if value="{{ isCampaigns }}" hint-placeholder-val="{{ false }}">
+<div style="padding:13px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid #eef1f4">
+<div style="display:flex;align-items:center;gap:7px;border:1px solid #dde3e9;border-radius:7px;padding:6px 10px;width:250px;background:#fff">
+<span style="width:11px;height:11px;border:1.5px solid #a6b0bb;border-radius:50%"></span>
+<input placeholder="Search campaign or funnel" style="border:0;outline:none;font:400 12px 'Helvetica Neue',Helvetica,sans-serif;width:100%;background:none" />
+</div>
+<select style="border:1px solid #dde3e9;border-radius:7px;padding:6px 9px;font:400 12px 'Helvetica Neue',Helvetica,sans-serif;background:#fff;color:#3f4a58"><option>utm_source: All</option><option>partner</option><option>prn</option></select>
+<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#3f4a58;border:1px solid #dde3e9;border-radius:7px;padding:6px 10px;cursor:pointer"><input type="checkbox" style="margin:0" />Hide campaigns with no customers</label>
+<div style="flex:1"></div>
+<button style="border:1px solid #dde3e9;background:#fff;border-radius:7px;padding:6px 11px;font:600 12px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer" style-hover="border-color:#17a34a">Export CSV</button>
+</div>
+<div style="overflow-x:auto">
+<table style="border-collapse:collapse;width:100%;min-width:1400px;font-size:12.5px">
+<thead><tr style="background:#fafbfc;color:#5b6673;text-align:left">
+<th style="padding:9px 14px;font-weight:600;border-bottom:1px solid #e4e8ed">Campaign</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Landing page</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">utm_source</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">utm_medium</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">utm_campaign</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Leads</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Confirmed customers</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">With first sale</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Eligible gross</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Estimated commission</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Conversion</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{ campaigns }}" as="c" hint-placeholder-count="4">
+<tr style="border-bottom:1px solid #f1f4f6;cursor:pointer" style-hover="background:#f7fafc">
+<td style="padding:10px 14px"><a href="#">{{ c.name }}</a></td>
+<td style="padding:10px 12px;color:#3f4a58">{{ c.funnel }}</td>
+<td style="padding:10px 12px;color:#3f4a58">{{ c.source }}</td>
+<td style="padding:10px 12px;color:#3f4a58">{{ c.medium }}</td>
+<td style="padding:10px 12px;color:#3f4a58">{{ c.utm }}</td>
+<td style="padding:10px 12px;text-align:right">{{ c.leads }}</td>
+<td style="padding:10px 12px;text-align:right">{{ c.confirmed }}</td>
+<td style="padding:10px 12px;text-align:right">{{ c.withSale }}</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums">{{ c.gross }}</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums">{{ c.est }}</td>
+<td style="padding:10px 12px;text-align:right">{{ c.conv }}</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="padding:12px 20px;font-size:11.5px;color:#8c96a2;border-top:1px solid #eef1f4">Marketing attribution provides supporting evidence. It does not override confirmed customer identity or commission eligibility.</div>
+</sc-if>
+
+<sc-if value="{{ isAudit }}" hint-placeholder-val="{{ false }}">
+<div style="padding:13px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid #eef1f4">
+<select style="border:1px solid #dde3e9;border-radius:7px;padding:6px 9px;font:400 12px 'Helvetica Neue',Helvetica,sans-serif;background:#fff;color:#3f4a58"><option>Actor: All</option><option>Brittany R.</option><option>System</option><option>GoHighLevel sync</option></select>
+<div style="display:flex;align-items:center;gap:7px;border:1px solid #dde3e9;border-radius:7px;padding:6px 10px;font-size:12px;cursor:pointer" style-hover="border-color:#17a34a"><span style="color:#6b7684">Date</span><span style="font-weight:600">Last 90 days</span></div>
+<div style="flex:1"></div>
+<button style="border:1px solid #dde3e9;background:#fff;border-radius:7px;padding:6px 11px;font:600 12px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer" style-hover="border-color:#17a34a">Export CSV</button>
+</div>
+<div style="padding:6px 20px 16px">
+<sc-for list="{{ audit }}" as="a" hint-placeholder-count="5">
+<div style="display:grid;grid-template-columns:150px 130px 1fr;gap:14px;padding:11px 0;border-bottom:1px solid #f1f4f6;font-size:12.5px">
+<span style="color:#8c96a2">{{ a.when }}</span>
+<span style="font-weight:600">{{ a.who }}</span>
+<span style="color:#3f4a58">{{ a.what }}</span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</section>
+</div>
+</sc-if>
+
+<sc-if value="{{ isPayoutView }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:1520px;margin:0 auto;display:flex;flex-direction:column;gap:14px">
+<button onClick="{{ goDetail }}" style="align-self:flex-start;border:0;background:none;padding:0;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;color:#1d6fe0;cursor:pointer">← Back to Northlake Dental</button>
+
+<section style="background:#fff;border:1px solid #e4e8ed;border-radius:10px;padding:18px 20px">
+<div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
+<div>
+<h1 style="margin:0;font:600 19px 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:-.01em">Payout review · July 2026</h1>
+<div style="margin-top:6px;font-size:12.5px;color:#3f4a58;white-space:nowrap">Northlake Dental <span style="color:#c7d0d8">·</span> Due Aug 15, 2026 <span style="color:#c7d0d8">·</span> Recalculated Aug 5, 2:50 PM <span style="color:#c7d0d8">·</span> Last reviewed: not yet reviewed</div>
+</div>
+<span style="font:600 11px 'Helvetica Neue',Helvetica,sans-serif;color:#8a5a06;background:#fdf6e7;border:1px solid #f0dfb4;border-radius:20px;padding:4px 10px">Pending Review · 4 exceptions</span>
+<div style="flex:1"></div>
+<div style="display:flex;gap:7px;flex-wrap:wrap">
+<button onClick="{{ confirmApprove }}" style="border:0;background:#17a34a;color:#fff;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;padding:9px 14px;border-radius:7px;cursor:pointer" style-hover="background:#128a3f">Approve Payout</button>
+<button style="border:1px solid #dde3e9;background:#fff;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;padding:8px 12px;border-radius:7px;cursor:pointer" style-hover="border-color:#17a34a">Place on Hold</button>
+<button style="border:1px solid #dde3e9;background:#fff;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;padding:8px 12px;border-radius:7px;cursor:pointer" style-hover="border-color:#17a34a">Return for Review</button>
+<button style="border:1px solid #dde3e9;background:#fff;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;padding:8px 12px;border-radius:7px;cursor:pointer" style-hover="border-color:#17a34a">Schedule Payment</button>
+<button style="border:1px solid #dde3e9;background:#fff;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;padding:8px 12px;border-radius:7px;cursor:pointer" style-hover="border-color:#17a34a">Mark Paid</button>
+<button style="border:1px solid #dde3e9;background:#fff;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;padding:8px 12px;border-radius:7px;cursor:pointer" style-hover="border-color:#17a34a">Print Statement</button>
+</div>
+</div>
+<div style="margin-top:16px;display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#eef1f4;border:1px solid #eef1f4;border-radius:9px;overflow:hidden">
+<div style="background:#fff;padding:12px 14px"><div style="font-size:11px;color:#6b7684">Eligible gross</div><div style="margin-top:5px;font:600 17px 'Helvetica Neue',Helvetica,sans-serif">$137,320</div></div>
+<div style="background:#fff;padding:12px 14px"><div style="font-size:11px;color:#6b7684">Applied tier</div><div style="margin-top:5px;font:600 17px 'Helvetica Neue',Helvetica,sans-serif">Tier 3 · 3.0%</div></div>
+<div style="background:#fff;padding:12px 14px"><div style="font-size:11px;color:#6b7684">Base commission</div><div style="margin-top:5px;font:600 17px 'Helvetica Neue',Helvetica,sans-serif">$4,120</div></div>
+<div style="background:#fff;padding:12px 14px"><div style="font-size:11px;color:#6b7684">Adjustments</div><div style="margin-top:5px;font:600 17px 'Helvetica Neue',Helvetica,sans-serif;color:#a13d2d">−$612</div></div>
+<div style="background:#fff;padding:12px 14px"><div style="font-size:11px;color:#6b7684">Final amount</div><div style="margin-top:5px;font:600 17px 'Helvetica Neue',Helvetica,sans-serif">$3,508</div></div>
+<div style="background:#fff;padding:12px 14px"><div style="font-size:11px;color:#6b7684">Amount paid</div><div style="margin-top:5px;font:600 17px 'Helvetica Neue',Helvetica,sans-serif">$0</div></div>
+<div style="background:#fff;padding:12px 14px"><div style="font-size:11px;color:#6b7684">Remaining</div><div style="margin-top:5px;font:600 17px 'Helvetica Neue',Helvetica,sans-serif">$3,508</div></div>
+</div>
+</section>
+
+<section style="background:#fff;border:1px solid #e4e8ed;border-radius:10px">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid #eef1f4">
+<h2 style="margin:0;font:600 13.5px 'Helvetica Neue',Helvetica,sans-serif">Customer contribution</h2>
+<span style="font-size:11.5px;color:#8c96a2">Commissions are governed by each customer's own 12-month window — expand a customer to see their CardPointe transactions.</span>
+</div>
+<table style="border-collapse:collapse;width:100%;font-size:12.5px">
+<thead><tr style="background:#fafbfc;color:#5b6673;text-align:left">
+<th style="padding:9px 14px;font-weight:600;border-bottom:1px solid #e4e8ed">Customer</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">First eligible sale</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Expires</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Eligible txns</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Eligible gross</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Contribution</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Adjustments</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed;text-align:right">Final</th>
+<th style="padding:9px 12px;font-weight:600;border-bottom:1px solid #e4e8ed">Review status</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{ contributions }}" as="k" hint-placeholder-count="6">
+<tr onClick="{{ k.toggle }}" style="border-bottom:1px solid #f1f4f6;cursor:pointer" style-hover="background:#f7fafc">
+<td style="padding:10px 14px"><span style="color:#a6b0bb;font-size:10px;margin-right:8px">{{ k.caret }}</span><a href="#" style="font-weight:600">{{ k.name }}</a></td>
+<td style="padding:10px 12px;color:#3f4a58">{{ k.firstSale }}</td>
+<td style="padding:10px 12px;color:#3f4a58">{{ k.expires }}</td>
+<td style="padding:10px 12px;text-align:right">{{ k.txns }}</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums">{{ k.gross }}</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums">{{ k.contribution }}</td>
+<td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums;color:{{ k.adjFg }}">{{ k.adj }}</td>
+<td style="padding:10px 12px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums">{{ k.final }}</td>
+<td style="padding:10px 12px"><span style="font:600 10.5px 'Helvetica Neue',Helvetica,sans-serif;padding:3px 8px;border-radius:20px;background:{{ k.badgeBg }};color:{{ k.badgeFg }};border:1px solid {{ k.badgeBd }};white-space:nowrap">{{ k.review }}</span></td>
+</tr>
+<sc-if value="{{ k.open }}" hint-placeholder-val="{{ false }}">
+<tr style="background:#fafbfc;border-bottom:1px solid #eef1f4"><td colspan="9" style="padding:0">
+<table style="border-collapse:collapse;width:100%;font-size:12px">
+<tbody>
+<tr style="color:#8c96a2"><td style="padding:8px 14px 8px 44px;font-weight:600">Aug 2, 2026</td><td style="padding:8px 12px;font-family:ui-monospace,Menlo,monospace">CP-88214-0092</td><td style="padding:8px 12px">Eligible</td><td style="padding:8px 12px;text-align:right;color:#111a26">$3,140</td><td style="padding:8px 12px;text-align:right;color:#111a26">$94.20</td><td style="padding:8px 12px">Lakeland</td></tr>
+<tr style="color:#8c96a2"><td style="padding:8px 14px 8px 44px;font-weight:600">Jul 21, 2026</td><td style="padding:8px 12px;font-family:ui-monospace,Menlo,monospace">CP-88214-0074</td><td style="padding:8px 12px">Eligible</td><td style="padding:8px 12px;text-align:right;color:#111a26">$1,880</td><td style="padding:8px 12px;text-align:right;color:#111a26">$56.40</td><td style="padding:8px 12px">Lakeland</td></tr>
+<tr style="color:#8c96a2"><td style="padding:8px 14px 8px 44px;font-weight:600">Jul 9, 2026</td><td style="padding:8px 12px;font-family:ui-monospace,Menlo,monospace">CP-88214-0051</td><td style="padding:8px 12px;color:#a13d2d">Excluded · refunded</td><td style="padding:8px 12px;text-align:right;color:#111a26">$620</td><td style="padding:8px 12px;text-align:right;color:#111a26">$0.00</td><td style="padding:8px 12px">Winter Haven</td></tr>
+</tbody>
+</table>
+</td></tr>
+</sc-if>
+</sc-for>
+</tbody>
+</table>
+</section>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+<section style="background:#fff;border:1px solid #e4e8ed;border-radius:10px;padding:16px 18px">
+<h2 style="margin:0;font:600 13.5px 'Helvetica Neue',Helvetica,sans-serif">Exceptions <span style="font-weight:400;color:#98a3af">4</span></h2>
+<div style="margin-top:12px;display:flex;flex-direction:column;gap:9px">
+<sc-for list="{{ exceptions }}" as="e" hint-placeholder-count="4">
+<div style="border:1px solid #f0dfb4;background:#fffdf7;border-radius:8px;padding:11px 13px;display:flex;align-items:flex-start;gap:12px">
+<div style="flex:1">
+<div style="font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif">{{ e.title }}</div>
+<div style="margin-top:3px;font-size:11.5px;color:#5b6673">{{ e.detail }}</div>
+</div>
+<button style="flex:none;border:1px solid #dde3e9;background:#fff;border-radius:6px;padding:5px 10px;font:600 11.5px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer" style-hover="border-color:#17a34a">Resolve</button>
+</div>
+</sc-for>
+</div>
+</section>
+<section style="background:#fff;border:1px solid #e4e8ed;border-radius:10px;padding:16px 18px">
+<h2 style="margin:0;font:600 13.5px 'Helvetica Neue',Helvetica,sans-serif">Adjustments</h2>
+<table style="border-collapse:collapse;width:100%;font-size:12.5px;margin-top:10px">
+<thead><tr style="color:#5b6673;text-align:left"><th style="padding:7px 0;font-weight:600;border-bottom:1px solid #eef1f4">Type</th><th style="padding:7px 0;font-weight:600;border-bottom:1px solid #eef1f4">Reason</th><th style="padding:7px 0;font-weight:600;border-bottom:1px solid #eef1f4">Added by</th><th style="padding:7px 0;font-weight:600;border-bottom:1px solid #eef1f4;text-align:right">Amount</th></tr></thead>
+<tbody>
+<tr><td style="padding:9px 0;border-bottom:1px solid #f1f4f6">Chargeback</td><td style="padding:9px 0;border-bottom:1px solid #f1f4f6;color:#3f4a58">CP-88214-0051 refunded</td><td style="padding:9px 0;border-bottom:1px solid #f1f4f6;color:#3f4a58">System</td><td style="padding:9px 0;border-bottom:1px solid #f1f4f6;text-align:right;color:#a13d2d">−$18.60</td></tr>
+<tr><td style="padding:9px 0;border-bottom:1px solid #f1f4f6">Clawback</td><td style="padding:9px 0;border-bottom:1px solid #f1f4f6;color:#3f4a58">Attribution conflict, M. Alvarez</td><td style="padding:9px 0;border-bottom:1px solid #f1f4f6;color:#3f4a58">Brittany R.</td><td style="padding:9px 0;border-bottom:1px solid #f1f4f6;text-align:right;color:#a13d2d">−$743.40</td></tr>
+<tr><td style="padding:9px 0;border-bottom:1px solid #f1f4f6">Bonus</td><td style="padding:9px 0;border-bottom:1px solid #f1f4f6;color:#3f4a58">Q3 referral milestone</td><td style="padding:9px 0;border-bottom:1px solid #f1f4f6;color:#3f4a58">Brittany R.</td><td style="padding:9px 0;border-bottom:1px solid #f1f4f6;text-align:right;color:#0f5c2e">+$150.00</td></tr>
+</tbody>
+</table>
+<button style="margin-top:12px;border:1px solid #dde3e9;background:#fff;border-radius:7px;padding:7px 12px;font:600 12px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer" style-hover="border-color:#17a34a">Add Adjustment</button>
+</section>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isEmptyView }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:14px">
+<div>
+<h1 style="margin:0;font:600 19px 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:-.01em">Empty and syncing states</h1>
+<p style="margin:6px 0 0;font-size:12.5px;color:#6b7684;max-width:640px">Every empty panel names the reason, the last sync, and the next action — never a bare "No records found."</p>
+</div>
+<sc-for list="{{ empties }}" as="e" hint-placeholder-count="3">
+<section style="background:#fff;border:1px solid #e4e8ed;border-radius:10px">
+<div style="padding:13px 18px;border-bottom:1px solid #eef1f4;font:600 13px 'Helvetica Neue',Helvetica,sans-serif">{{ e.panel }}</div>
+<div style="padding:34px 18px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px">
+<div style="width:36px;height:36px;border-radius:9px;border:1.5px dashed #cfd6de"></div>
+<div style="font:600 13.5px 'Helvetica Neue',Helvetica,sans-serif">{{ e.headline }}</div>
+<div style="font-size:12.5px;color:#5b6673;max-width:520px;line-height:1.6">{{ e.body }}</div>
+<div style="font-size:11.5px;color:#8c96a2">{{ e.meta }}</div>
+<div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">{{ e.actionsEl }}</div>
+</div>
+</section>
+</sc-for>
+</div>
+</sc-if>
+
+</main>
+</div>
+
+<sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(15,22,34,.32);display:flex;justify-content:flex-end;z-index:20">
+<div onClick="{{ closeDrawer }}" style="flex:1"></div>
+<div style="width:440px;background:#fff;height:100%;overflow:auto;box-shadow:-8px 0 24px rgba(15,22,34,.14);padding:20px 22px">
+<div style="display:flex;align-items:flex-start;gap:12px">
+<div style="flex:1">
+<div style="font:600 15px 'Helvetica Neue',Helvetica,sans-serif">Commission detail</div>
+<div style="margin-top:4px;font-size:12px;color:#6b7684">CP-88214-0092 · Marcia Alvarez · Aug 2, 2026</div>
+</div>
+<button onClick="{{ closeDrawer }}" style="border:1px solid #dde3e9;background:#fff;border-radius:6px;width:26px;height:26px;cursor:pointer;color:#6b7684">✕</button>
+</div>
+<div style="margin-top:16px;border:1px solid #eef1f4;border-radius:9px;overflow:hidden">
+<div style="display:flex;justify-content:space-between;padding:10px 13px;border-bottom:1px solid #eef1f4;font-size:12.5px"><span style="color:#6b7684">Gross amount</span><span style="font-weight:600">$3,140.00</span></div>
+<div style="display:flex;justify-content:space-between;padding:10px 13px;border-bottom:1px solid #eef1f4;font-size:12.5px"><span style="color:#6b7684">Non-commissionable</span><span>−$0.00</span></div>
+<div style="display:flex;justify-content:space-between;padding:10px 13px;border-bottom:1px solid #eef1f4;font-size:12.5px"><span style="color:#6b7684">Commissionable</span><span style="font-weight:600">$3,140.00</span></div>
+<div style="display:flex;justify-content:space-between;padding:10px 13px;border-bottom:1px solid #eef1f4;font-size:12.5px"><span style="color:#6b7684">Monthly tier applied</span><span>Tier 3 · 3.0%</span></div>
+<div style="display:flex;justify-content:space-between;padding:10px 13px;font-size:13px;background:#fafbfc"><span style="font-weight:600">Commission contribution</span><span style="font-weight:600">$94.20</span></div>
+</div>
+<div style="margin-top:16px;font:600 9.5px 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#98a3af">Eligibility</div>
+<div style="margin-top:6px;font-size:12.5px;line-height:1.7;color:#3f4a58">Inside attribution window (day 141 of 365)<br />Customer identity: Confirmed<br />Location: Lakeland<br />Payout month: August 2026 · <span style="color:#8a5a06;font-weight:600">Estimated, month open</span></div>
+<div style="margin-top:16px;font:600 9.5px 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#98a3af">Notes</div>
+<div style="margin-top:6px;font-size:12.5px;color:#3f4a58">No adjustments applied to this transaction.</div>
+<div style="margin-top:18px;display:flex;gap:8px">
+<button style="border:1px solid #dde3e9;background:#fff;border-radius:7px;padding:8px 12px;font:600 12px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer" style-hover="border-color:#17a34a">Add Adjustment</button>
+<button style="border:1px solid #dde3e9;background:#fff;border-radius:7px;padding:8px 12px;font:600 12px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer" style-hover="border-color:#17a34a">View Transaction</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(15,22,34,.32);display:flex;align-items:center;justify-content:center;z-index:30">
+<div style="width:420px;background:#fff;border-radius:12px;padding:22px 24px;box-shadow:0 18px 40px rgba(15,22,34,.22)">
+<div style="font:600 15px 'Helvetica Neue',Helvetica,sans-serif">Approve July 2026 payout?</div>
+<div style="margin-top:8px;font-size:12.5px;color:#5b6673;line-height:1.6">Northlake Dental · final amount <strong>$3,508.00</strong>. Approving moves this payout from Pending Review to Approved and Owed. 4 exceptions are still open and will be recorded on the statement.</div>
+<div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px">
+<button onClick="{{ closeConfirm }}" style="border:1px solid #dde3e9;background:#fff;border-radius:7px;padding:8px 14px;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer">Cancel</button>
+<button onClick="{{ closeConfirm }}" style="border:0;background:#17a34a;color:#fff;border-radius:7px;padding:9px 14px;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;cursor:pointer">Approve Payout</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const G = {ok:['#e8f7ee','#0f5c2e','#bfe6cd'], warn:['#fdf6e7','#8a5a06','#f0dfb4'], info:['#eef4fd','#1558b0','#c9dcf7'], grey:['#f1f4f6','#5b6673','#e4e8ed'], vio:['#f3f0fc','#5b3fa8','#ddd4f5'], red:['#fdf1ef','#a13d2d','#f2d3cc']};
+
+class Component extends DCLogic {
+  state = {view:'detail', tab:'customers', openRows:{}, openContrib:{}, drawer:false, confirm:false};
+
+  tabStyle(k){ const on = this.state.tab===k; return [on?'#111a26':'#6b7684', on?'inset 0 -2px 0 #17a34a':'none']; }
+  navStyle(v){ const on = this.state.view===v; return [on?'#111a26':'#5b6673', on?'inset 0 -2px 0 #17a34a':'none']; }
+  badge(kind){ const c=G[kind]||G.grey; return {badgeBg:c[0],badgeFg:c[1],badgeBd:c[2]}; }
+  btn(label, primary){ return React.createElement('button',{key:label,style:{border:primary?0:'1px solid #dde3e9',background:primary?'#17a34a':'#fff',color:primary?'#fff':'#111a26',borderRadius:6,padding:primary?'6px 10px':'5px 9px',font:"600 11.5px 'Helvetica Neue',Helvetica,sans-serif",cursor:'pointer',whiteSpace:'nowrap'}},label); }
+  actions(list){ return React.createElement('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, list.map(([l,p])=>this.btn(l,p))); }
+
+  renderVals(){
+    const [tCustFg,tCustLine]=this.tabStyle('customers');
+    const [tCommFg,tCommLine]=this.tabStyle('commissions');
+    const [tPayFg,tPayLine]=this.tabStyle('payouts');
+    const [tCampFg,tCampLine]=this.tabStyle('campaigns');
+    const [tAudFg,tAudLine]=this.tabStyle('audit');
+    const [navAffFg,navAffLine]=this.navStyle('detail');
+    const [navPayFg,navPayLine]=this.navStyle('payout');
+    const [navEmpFg,navEmpLine]=this.navStyle('empty');
+
+    const cRaw = [
+      {name:'Marcia Alvarez',id:'CUST-10428',status:'Active',kind:'ok',campaign:'Local Business Partners',funnel:'/new-patient-offer',firstRef:'Mar 2, 2026',firstSale:'Mar 15, 2026',days:224,pct:39,expires:'Mar 15, 2027',gross:'$41,280',est:'$1,238',appr:'$964',paid:'$3,420',lastSale:'Aug 2, 2026',location:'Lakeland',match:'Confirmed',matchOk:true,action:null},
+      {name:'Dwight Pemberton',id:'CUST-10390',status:'Expiring Soon',kind:'warn',campaign:'Local Business Partners',funnel:'/free-consult',firstRef:'Aug 18, 2025',firstSale:'Sep 4, 2025',days:30,pct:92,expires:'Sep 4, 2026',gross:'$28,640',est:'$412',appr:'$1,140',paid:'$6,880',lastSale:'Jul 28, 2026',location:'Winter Haven',match:'Confirmed',matchOk:true,action:'Window closes in 30 days'},
+      {name:'Renata Cho',id:'CUST-10511',status:'Attribution Conflict',kind:'red',campaign:'Practice Referral Network',funnel:'/partner-lp',firstRef:'Jun 11, 2026',firstSale:'Jun 30, 2026',days:329,pct:10,expires:'Jun 30, 2027',gross:'$9,120',est:'$0',appr:'$0',paid:'$0',lastSale:'Aug 1, 2026',location:'Lakeland',match:'Two affiliates claim',matchOk:false,action:'Assign attribution'},
+      {name:'Terrell Boyd',id:'CUST-10466',status:'Awaiting First Sale',kind:'grey',campaign:'Local Business Partners',funnel:'/new-patient-offer',firstRef:'Jul 22, 2026',firstSale:'—',days:null,pct:0,expires:'—',gross:'$0',est:'$0',appr:'$0',paid:'$0',lastSale:'—',location:'Plant City',match:'Confirmed',matchOk:true,action:null},
+      {name:'Alice Ferraro',id:'CUST-10287',status:'Active',kind:'ok',campaign:'Local Business Partners',funnel:'/free-consult',firstRef:'Dec 4, 2025',firstSale:'Jan 9, 2026',days:157,pct:57,expires:'Jan 9, 2027',gross:'$63,410',est:'$1,902',appr:'$2,180',paid:'$9,240',lastSale:'Aug 4, 2026',location:'Lakeland',match:'Confirmed',matchOk:true,action:null},
+      {name:'Owen Radley',id:'CUST-10502',status:'Unmatched',kind:'vio',campaign:'Local Business Partners',funnel:'/partner-lp',firstRef:'Jul 6, 2026',firstSale:'Jul 19, 2026',days:348,pct:5,expires:'Jul 19, 2027',gross:'$4,860',est:'$0',appr:'$0',paid:'$0',lastSale:'Jul 30, 2026',location:'Winter Haven',match:'No Practice Fusion match',matchOk:false,action:'Review identity match'},
+      {name:'Nadia Brooks',id:'CUST-10344',status:'House Customer',kind:'grey',campaign:'—',funnel:'—',firstRef:'Oct 1, 2025',firstSale:'Oct 14, 2025',days:null,pct:0,expires:'—',gross:'$18,930',est:'$0',appr:'$0',paid:'$0',lastSale:'Jul 12, 2026',location:'Lakeland',match:'Confirmed',matchOk:true,action:null},
+      {name:'Sam Whitcomb',id:'CUST-10455',status:'Active',kind:'ok',campaign:'Practice Referral Network',funnel:'/partner-lp',firstRef:'May 8, 2026',firstSale:'May 27, 2026',days:295,pct:19,expires:'May 27, 2027',gross:'$21,470',est:'$644',appr:'$0',paid:'$0',lastSale:'Aug 3, 2026',location:'Plant City',match:'Confirmed',matchOk:true,action:null}
+    ];
+    const customers = cRaw.map((c,i)=>{
+      const open = !!this.state.openRows[i];
+      return Object.assign({}, c, this.badge(c.kind), {
+        open, caret: open?'▾':'▸',
+        rowBg: open?'#fafbfc':'#fff', stickyBg: open?'#fafbfc':'#fff',
+        toggle: ()=>this.setState(s=>({openRows:Object.assign({},s.openRows,{[i]:!s.openRows[i]})})),
+        windowText: c.days==null ? (c.status==='House Customer'?'Not attributed':'No window yet — starts at first eligible sale') : c.days+' days remaining · expires '+c.expires,
+        pct: c.pct+'%',
+        pctText: c.days==null?'—':c.pct+'% of 12-month window elapsed',
+        barColor: c.pct>85?'#e0a92b':'#17a34a',
+        matchFg: c.matchOk?'#3f4a58':'#a13d2d',
+        actionCell: c.action ? this.actions([[c.action.length>24?'Review':c.action,true]]) : React.createElement('span',{style:{color:'#c7d0d8'}},'—')
+      });
+    });
+
+    const commissions = [
+      {date:'Aug 2, 2026',customer:'Marcia Alvarez',txn:'CP-88214-0092',gross:'$3,140',commissionable:'$3,140',tier:'Tier 3 · 3.0%',contribution:'$94.20',eligibility:'Eligible',month:'Aug 2026',status:'Estimated Commission',kind:'grey',adjustment:'—',notes:''},
+      {date:'Jul 28, 2026',customer:'Dwight Pemberton',txn:'CP-88031-0417',gross:'$2,410',commissionable:'$2,410',tier:'Tier 3 · 3.0%',contribution:'$72.30',eligibility:'Eligible',month:'Jul 2026',status:'Pending Review',kind:'warn',adjustment:'—',notes:'Month closed Aug 1'},
+      {date:'Jul 21, 2026',customer:'Alice Ferraro',txn:'CP-88214-0074',gross:'$1,880',commissionable:'$1,880',tier:'Tier 3 · 3.0%',contribution:'$56.40',eligibility:'Eligible',month:'Jul 2026',status:'Pending Review',kind:'warn',adjustment:'—',notes:''},
+      {date:'Jul 9, 2026',customer:'Marcia Alvarez',txn:'CP-88214-0051',gross:'$620',commissionable:'$0',tier:'—',contribution:'$0.00',eligibility:'Excluded · refunded',month:'Jul 2026',status:'Pending Review',kind:'warn',adjustment:'Chargeback −$18.60',notes:'Refund posted Jul 14'},
+      {date:'Jul 2, 2026',customer:'Renata Cho',txn:'CP-88450-0033',gross:'$4,120',commissionable:'$0',tier:'—',contribution:'$0.00',eligibility:'Held · conflict',month:'Jul 2026',status:'Held',kind:'vio',adjustment:'Clawback −$743.40',notes:'Two affiliates claim referral'},
+      {date:'Jun 24, 2026',customer:'Sam Whitcomb',txn:'CP-88102-0198',gross:'$5,260',commissionable:'$5,260',tier:'Tier 2 · 2.5%',contribution:'$131.50',eligibility:'Eligible',month:'Jun 2026',status:'Approved and Owed',kind:'ok',adjustment:'—',notes:''},
+      {date:'Jun 12, 2026',customer:'Alice Ferraro',txn:'CP-88102-0141',gross:'$3,980',commissionable:'$3,980',tier:'Tier 2 · 2.5%',contribution:'$99.50',eligibility:'Eligible',month:'Jun 2026',status:'Scheduled Payment',kind:'info',adjustment:'—',notes:'Batch Aug 15'},
+      {date:'May 30, 2026',customer:'Marcia Alvarez',txn:'CP-87940-0288',gross:'$2,760',commissionable:'$2,760',tier:'Tier 2 · 2.5%',contribution:'$69.00',eligibility:'Eligible',month:'May 2026',status:'Paid',kind:'ok',adjustment:'—',notes:'ACH 8841'}
+    ].map(r=>Object.assign({},r,this.badge(r.kind),{eligFg: r.eligibility.indexOf('Eligible')===0?'#3f4a58':'#a13d2d'}));
+
+    const payouts = [
+      {month:'Aug 2026',due:'Sep 15, 2026',gross:'$486,204',tier:'Tier 3 · 3.0%',base:'$14,586',adj:'—',final:'$14,586',status:'Estimated Commission',kind:'grey',paidDate:'—',ref:'—',acts:[['View',false]]},
+      {month:'Jul 2026',due:'Aug 15, 2026',gross:'$137,320',tier:'Tier 3 · 3.0%',base:'$4,120',adj:'−$612',final:'$3,508',status:'Pending Review',kind:'warn',paidDate:'—',ref:'—',acts:[['Review',true],['Hold',false]]},
+      {month:'Jun 2026',due:'Jul 15, 2026',gross:'$128,940',tier:'Tier 2 · 2.5%',base:'$3,224',adj:'+$150',final:'$3,374',status:'Approved and Owed',kind:'ok',paidDate:'—',ref:'—',acts:[['Schedule Payment',true],['Statement',false]]},
+      {month:'May 2026',due:'Jun 15, 2026',gross:'$119,600',tier:'Tier 2 · 2.5%',base:'$2,990',adj:'—',final:'$2,990',status:'Scheduled Payment',kind:'info',paidDate:'—',ref:'Batch AUG-15',acts:[['Mark Paid',true],['Statement',false]]},
+      {month:'Apr 2026',due:'May 15, 2026',gross:'$104,180',tier:'Tier 2 · 2.5%',base:'$2,604',adj:'−$88',final:'$2,516',status:'Paid',kind:'ok',paidDate:'May 14, 2026',ref:'ACH 8841',acts:[['View Statement',false]]},
+      {month:'Mar 2026',due:'Apr 15, 2026',gross:'$96,720',tier:'Tier 2 · 2.5%',base:'$2,418',adj:'—',final:'$2,418',status:'Held',kind:'vio',paidDate:'—',ref:'—',acts:[['Release Hold',true],['Notes',false]]}
+    ].map(p=>Object.assign({},p,this.badge(p.kind),{adjFg: p.adj.indexOf('−')===0?'#a13d2d':(p.adj.indexOf('+')===0?'#0f5c2e':'#3f4a58'), actionCell:this.actions(p.acts)}));
+
+    const campaigns = [
+      {name:'Local Business Partners',funnel:'/new-patient-offer',source:'partner',medium:'referral',utm:'nldp-summer26',leads:'214',confirmed:'38',withSale:'31',gross:'$318,420',est:'$9,552',conv:'17.8%'},
+      {name:'Local Business Partners',funnel:'/free-consult',source:'partner',medium:'referral',utm:'nldp-consult',leads:'96',confirmed:'14',withSale:'11',gross:'$121,640',est:'$3,649',conv:'14.6%'},
+      {name:'Practice Referral Network',funnel:'/partner-lp',source:'prn',medium:'referral',utm:'prn-2026',leads:'61',confirmed:'9',withSale:'6',gross:'$46,144',est:'$1,385',conv:'14.8%'},
+      {name:'[Not set]',funnel:'—',source:'—',medium:'—',utm:'—',leads:'12',confirmed:'0',withSale:'0',gross:'$0',est:'$0',conv:'0.0%'}
+    ];
+
+    const audit = [
+      {when:'Aug 5, 2026 2:50 PM',who:'System',what:'Recalculated July 2026 payout after CardPointe sync — base commission $4,120.'},
+      {when:'Aug 3, 2026 9:14 AM',who:'Brittany R.',what:'Clawback −$743.40 added to July 2026 for attribution conflict (Renata Cho).'},
+      {when:'Aug 1, 2026 12:00 AM',who:'System',what:'July 2026 sale month closed — commissions moved from Estimated to Pending Review.'},
+      {when:'Jul 22, 2026 4:38 PM',who:'GoHighLevel sync',what:'1 new referred contact added to Local Business Partners (Terrell Boyd).'},
+      {when:'Jul 15, 2026 10:02 AM',who:'Brittany R.',what:'Approved June 2026 payout — $3,374 moved to Approved and Owed.'}
+    ];
+
+    const contributions = [
+      {name:'Marcia Alvarez',firstSale:'Mar 15, 2026',expires:'Mar 15, 2027',txns:'5',gross:'$38,140',contribution:'$1,144.20',adj:'−$18.60',final:'$1,125.60',review:'Needs review',kind:'warn'},
+      {name:'Alice Ferraro',firstSale:'Jan 9, 2026',expires:'Jan 9, 2027',txns:'6',gross:'$44,220',contribution:'$1,326.60',adj:'—',final:'$1,326.60',review:'Reviewed',kind:'ok'},
+      {name:'Dwight Pemberton',firstSale:'Sep 4, 2025',expires:'Sep 4, 2026',txns:'4',gross:'$26,410',contribution:'$792.30',adj:'—',final:'$792.30',review:'Reviewed',kind:'ok'},
+      {name:'Sam Whitcomb',firstSale:'May 27, 2026',expires:'May 27, 2027',txns:'3',gross:'$18,430',contribution:'$552.90',adj:'—',final:'$552.90',review:'Reviewed',kind:'ok'},
+      {name:'Renata Cho',firstSale:'Jun 30, 2026',expires:'Jun 30, 2027',txns:'2',gross:'$9,120',contribution:'$273.60',adj:'−$743.40',final:'−$469.80',review:'Held',kind:'vio'},
+      {name:'Owen Radley',firstSale:'Jul 19, 2026',expires:'Jul 19, 2027',txns:'1',gross:'$1,000',contribution:'$30.00',adj:'—',final:'$0.00',review:'Unmatched',kind:'red'}
+    ].map((k,i)=>{
+      const open=!!this.state.openContrib[i];
+      return Object.assign({},k,this.badge(k.kind),{open,caret:open?'▾':'▸',
+        adjFg: k.adj.indexOf('−')===0?'#a13d2d':'#3f4a58',
+        toggle: ()=>this.setState(s=>({openContrib:Object.assign({},s.openContrib,{[i]:!s.openContrib[i]})}))});
+    });
+
+    const exceptions = [
+      {title:'Attribution conflict · Renata Cho',detail:'Two affiliates claim this referral. Commission held pending assignment.'},
+      {title:'Unmatched identity · Owen Radley',detail:'No Practice Fusion match found for the referred contact.'},
+      {title:'Refund after commission · CP-88214-0051',detail:'$620 sale refunded Jul 14 — chargeback adjustment of −$18.60 applied.'},
+      {title:'Late transaction sync · Winter Haven',detail:'3 CardPointe transactions arrived after month close and were included.'}
+    ];
+
+    const revBars = ['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun','Jul'].map((label,i)=>{
+      const g=[38,44,41,47,52,58,55,63,68,72,79,86][i], x=[8,7,10,6,9,7,11,8,7,9,6,8][i];
+      const c=Math.round(g*0.42);
+      return {label, gross:g+'%', excl:x+'%', comm:c+'%',
+        tip:label+' · eligible gross $'+g+'0k · excluded $'+x+'k · commission earned $'+(g*30)};
+    });
+    const lifeBars = [['First sale','$1.2k',12],['30d','$2.4k',22],['90d','$4.9k',42],['180d','$7.8k',62],['270d','$11.1k',80],['365d','$14.6k',96]]
+      .map(([label,value,h])=>({label,value,h:h+'%'}));
+
+    const empties = [
+      {panel:'Referred Customers',headline:'No referred customers have been synchronized for this affiliate.',
+       body:'The affiliate exists in GoHighLevel but no contacts have been attributed to their campaigns yet. New contacts appear here within 15 minutes of a sync.',
+       meta:'Last sync Aug 5, 2026 · 2:50 PM · campaign mapping: 1 of 2 campaigns mapped',
+       acts:[['Sync GoHighLevel',true],['Check Campaign Mapping',false],['View Integration Status',false]]},
+      {panel:'Commissions · Jul 6 – Aug 5, 2026',headline:'No eligible CardPointe sales were found for this affiliate during the selected period.',
+       body:'4 referred customers are inside their attribution window, but none transacted in this range. 2 transactions are waiting in Unmatched Transactions and may belong here.',
+       meta:'Last CardPointe sync Aug 5, 2026 · 2:44 PM',
+       acts:[['Change Date Range',true],['Review Unmatched Transactions',false]]},
+      {panel:'Payouts · Aug 2026',headline:'A payout will be created after the sale month closes.',
+       body:'August 2026 is still open, so commissions remain Estimated and may change. The payout record is generated on Sep 1 once all required transactions are synchronized.',
+       meta:'Estimated so far $14,586 · 62 commission items · month closes Sep 1, 2026',
+       acts:[['View Estimated Commissions',true],['Open Payout Calendar',false]]}
+    ].map(e=>Object.assign({},e,{actionsEl:this.actions(e.acts)}));
+
+    return {
+      isDetail:this.state.view==='detail', isPayoutView:this.state.view==='payout', isEmptyView:this.state.view==='empty',
+      goDetail:()=>this.setState({view:'detail'}), goPayout:()=>this.setState({view:'payout'}), goEmpty:()=>this.setState({view:'empty'}),
+      navAffFg,navAffLine,navPayFg,navPayLine,navEmpFg,navEmpLine,
+      isCustomers:this.state.tab==='customers', isCommissions:this.state.tab==='commissions', isPayouts:this.state.tab==='payouts',
+      isCampaigns:this.state.tab==='campaigns', isAudit:this.state.tab==='audit',
+      tabCustomers:()=>this.setState({tab:'customers'}), tabCommissions:()=>this.setState({tab:'commissions'}),
+      tabPayouts:()=>this.setState({tab:'payouts'}), tabCampaigns:()=>this.setState({tab:'campaigns'}), tabAudit:()=>this.setState({tab:'audit'}),
+      tCustFg,tCustLine,tCommFg,tCommLine,tPayFg,tPayLine,tCampFg,tCampLine,tAudFg,tAudLine,
+      customers, commissions, payouts, campaigns, audit, contributions, exceptions, revBars, lifeBars, empties,
+      drawerOpen:this.state.drawer, openDrawer:()=>this.setState({drawer:true}), closeDrawer:()=>this.setState({drawer:false}),
+      confirmOpen:this.state.confirm, confirmApprove:()=>this.setState({confirm:true}), closeConfirm:()=>this.setState({confirm:false})
+    };
+  }
+}
+</script>
+</body>
+</html>
