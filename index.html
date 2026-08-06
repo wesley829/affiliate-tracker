@@ -314,12 +314,32 @@ const app = {
 
   openPay(){ state.payOpen = true; state.payMsg = null; state.payBusy = false; renderOverlays(); },
   closePay(){ state.payOpen = false; renderOverlays(); },
+  recalcPay(){
+    const checks = [...document.querySelectorAll('.pay-check')];
+    const total = checks.filter(el=>el.checked).reduce((s,el)=>s+Number(el.dataset.amt),0);
+    const totalEl = document.getElementById('pay-total');
+    if (totalEl) totalEl.textContent = usd(total);
+    const min = Number(M.aff.min_payout||0);
+    const below = min>0 && total < min;
+    const btn = document.getElementById('pay-send-btn');
+    if (btn) btn.disabled = below;
+    const note = document.getElementById('pay-threshold-note');
+    if (note) {
+      note.style.color = below ? '#a13d2d' : '#8c96a2';
+      note.textContent = below
+        ? `Below the $${min.toFixed(2)} minimum — select more months or wait for the balance to grow.`
+        : `$${min.toFixed(2)} minimum — balances below this roll over to the next month.`;
+    }
+  },
   async submitPay(){
     const ids = [...document.querySelectorAll('.pay-check:checked')].map(el=>el.dataset.id);
     const receiver = (document.getElementById('pay-receiver')?.value||'').trim();
     state.payReceiver = receiver;
     if (!ids.length){ state.payMsg = {kind:'err', text:'Select at least one payout month.'}; return renderOverlays(); }
     if (!receiver.includes('@')){ state.payMsg = {kind:'err', text:"Enter the affiliate's PayPal email."}; return renderOverlays(); }
+    const total = [...document.querySelectorAll('.pay-check:checked')].reduce((s,el)=>s+Number(el.dataset.amt),0);
+    const min = Number(M.aff.min_payout||0);
+    if (min>0 && total < min){ state.payMsg = {kind:'err', text:`Selected total ${usd(total)} is below the $${min.toFixed(2)} minimum payout threshold.`}; return renderOverlays(); }
     state.payBusy = true; state.payMsg = null; renderOverlays();
     try {
       const res = await callFn('payments-send', {payout_ids: ids, receiver});
@@ -456,7 +476,7 @@ ${webLinks(a)?`<div style="margin-top:2px">${webLinks(a)}</div>`:''}
 <div><div class="lab">Status</div><div style="margin-top:3px;display:flex;align-items:center;gap:5px;font-size:12.5px"><span style="width:6px;height:6px;border-radius:50%;background:#17a34a"></span>${esc(a.status[0].toUpperCase()+a.status.slice(1))}</div></div>
 <div><div class="lab">Agreement</div><div style="margin-top:3px;font-size:12.5px">${a.agreement==='founding'?'Founding partner':'Standard'}</div></div>
 <div><div class="lab">Start date</div><div style="margin-top:3px;font-size:12.5px">${fmtDate(a.start_date)}</div></div>
-<div><div class="lab">Payouts</div><div style="margin-top:3px;font-size:12.5px">${esc(a.payout_method)} · due the 15th</div></div>
+<div><div class="lab">Payouts</div><div style="margin-top:3px;font-size:12.5px">${esc(a.payout_method)} · due the 15th${Number(a.min_payout)>0?` · $${Number(a.min_payout).toFixed(0)} min`:''}</div></div>
 </div>
 <div style="margin-top:14px;padding-top:14px;border-top:1px solid #eef1f4">
 <div class="lab">Commission tiers</div>
@@ -858,8 +878,9 @@ ${paidRows}
 
 function payModalHTML(){
   const unpaid = M.payouts.filter(p=>p.status!=='paid');
+  const minPayout = Number(M.aff.min_payout||0);
   const rows = unpaid.map(p=>`<label style="display:flex;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid #eef1f4;font-size:12.5px;cursor:pointer">
-    <input type="checkbox" class="pay-check" data-id="${p.id}" checked style="margin:0">
+    <input type="checkbox" class="pay-check" data-id="${p.id}" data-amt="${Number(p.commission)}" checked onchange="app.recalcPay()" style="margin:0">
     <span style="flex:1">${monthLabel(monthKey(p.sale_month))} · ${esc(p.tier)} · ${Math.round(p.rate*100)}%</span>
     <span style="font-weight:600;font-variant-numeric:tabular-nums">${usd(p.commission)}</span>
   </label>`).join('');
@@ -872,8 +893,9 @@ function payModalHTML(){
 <div style="margin-top:6px;font-size:12px;color:#6b7684">Money moves from the Premier Solutions PayPal balance when you confirm.</div>
 ${unpaid.length ? `<div style="margin-top:12px;border:1px solid #eef1f4;border-radius:9px;overflow:hidden" id="pay-list">
 ${rows}
-<div style="display:flex;justify-content:space-between;padding:9px 13px;background:#fafbfc;font-size:12.5px"><span style="font-weight:600">Total</span><span style="font-weight:600;color:#0f5c2e">${usd(total)}</span></div>
+<div style="display:flex;justify-content:space-between;padding:9px 13px;background:#fafbfc;font-size:12.5px"><span style="font-weight:600">Total</span><span id="pay-total" style="font-weight:600;color:#0f5c2e">${usd(total)}</span></div>
 </div>
+${minPayout>0?`<div id="pay-threshold-note" style="margin-top:8px;font-size:11.5px;color:#8c96a2">$${minPayout.toFixed(2)} minimum — balances below this roll over to the next month.</div>`:''}
 <div style="margin-top:12px">
 <div class="lab">Affiliate PayPal email</div>
 <input id="pay-receiver" class="login-input" style="margin-top:6px" type="email" placeholder="name@example.com" value="${esc(receiver)}">
@@ -881,7 +903,7 @@ ${rows}
 ${msg}
 <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px">
 <button onclick="app.closePay()" class="btn" style="padding:8px 14px;font-size:12.5px">${state.payMsg&&state.payMsg.kind==='ok'?'Close':'Cancel'}</button>
-${unpaid.length?`<button onclick="app.submitPay()" class="btn-primary" ${state.payBusy?'disabled':''}>${state.payBusy?'Sending…':'Send Payout'}</button>`:''}
+${unpaid.length?`<button id="pay-send-btn" onclick="app.submitPay()" class="btn-primary" ${state.payBusy?'disabled':''}>${state.payBusy?'Sending…':'Send Payout'}</button>`:''}
 </div>
 </div>
 </div>`;
