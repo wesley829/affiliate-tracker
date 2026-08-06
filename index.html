@@ -113,30 +113,22 @@ a:hover{color:#1558b0;text-decoration:underline}
 <div id="shell" style="display:none">
 <div style="display:flex;min-height:100vh;min-width:1240px;font-size:13px">
 
-<nav style="width:72px;flex:none;background:#0f1622;display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:2px">
-<div style="width:32px;height:32px;border-radius:9px;background:#17a34a;display:flex;align-items:center;justify-content:center;font:700 13px ui-monospace,Menlo,monospace;color:#06210f;margin-bottom:14px">PS</div>
-<a href="#" class="side-link"><span style="width:15px;height:15px;border:1.5px solid currentColor;border-radius:3px"></span><span style="font-size:9.5px">Home</span></a>
-<a href="#" class="side-link on"><span style="width:15px;height:15px;border:1.5px solid currentColor;border-radius:50%"></span><span style="font-size:9.5px">Affiliates</span></a>
-<a href="#" class="side-link"><span style="width:15px;height:15px;border:1.5px solid currentColor;border-radius:3px 3px 8px 3px"></span><span style="font-size:9.5px">Clients</span></a>
-<a href="#" class="side-link"><span style="width:15px;height:15px;border:1.5px solid currentColor;transform:rotate(45deg)"></span><span style="font-size:9.5px">Payouts</span></a>
-<a href="#" class="side-link"><span style="width:15px;height:15px;border:1.5px solid currentColor;border-radius:3px;border-left-width:5px"></span><span style="font-size:9.5px">Reports</span></a>
-<div style="flex:1"></div>
-<div id="avatar" style="width:28px;height:28px;border-radius:50%;background:#28374b;color:#cbd6e2;display:flex;align-items:center;justify-content:center;font:600 10.5px 'Helvetica Neue',Helvetica,sans-serif">·</div>
-</nav>
-
 <div style="flex:1;min-width:0;display:flex;flex-direction:column">
 
 <header style="flex:none;background:#fff;border-bottom:1px solid #e4e8ed;padding:0 26px;display:flex;align-items:center;gap:26px;height:52px">
+<div style="display:flex;align-items:center;gap:10px">
+<div style="width:28px;height:28px;border-radius:8px;background:#17a34a;display:flex;align-items:center;justify-content:center;font:700 12px ui-monospace,Menlo,monospace;color:#06210f">PS</div>
 <span style="font:600 15px 'Helvetica Neue',Helvetica,sans-serif">Premier Solutions · Affiliate Manager</span>
+</div>
 <div style="display:flex;gap:20px;font-size:13px;color:#5b6673">
-<button class="topnav-btn" id="nav-detail" onclick="app.setView('detail')">Dashboard</button>
 <button class="topnav-btn" id="nav-list" onclick="app.setView('list')">Affiliates</button>
+<button class="topnav-btn" id="nav-detail" onclick="app.setView('detail')">Dashboard</button>
 <button class="topnav-btn" id="nav-payout" onclick="app.setView('payout')">Payouts</button>
 <button class="topnav-btn" id="nav-empty" onclick="app.setView('empty')">Sync status</button>
-<a href="#" style="color:#5b6673;padding:16px 0">Settings</a>
 </div>
 <div style="flex:1"></div>
 <div id="header-status" style="font-size:11.5px;color:#6b7684"></div>
+<div id="avatar" style="width:28px;height:28px;border-radius:50%;background:#28374b;color:#cbd6e2;display:flex;align-items:center;justify-content:center;font:600 10.5px 'Helvetica Neue',Helvetica,sans-serif">·</div>
 <button class="btn" onclick="app.signOut()" style="padding:5px 10px">Sign out</button>
 </header>
 
@@ -176,6 +168,17 @@ function badge(kind, text){ const c = G[kind]||G.grey; return `<span class="badg
 function miniBtn(label, primary){ return `<button class="mini-btn${primary?' primary':''}">${esc(label)}</button>`; }
 function actions(list){ return `<div style="display:flex;gap:6px;flex-wrap:wrap">${list.map(([l,p])=>miniBtn(l,p)).join('')}</div>`; }
 function infoI(tip){ return `<span class="info-i" title="${esc(tip)}">i</span>`; }
+function webLinks(a){
+  const chips = [];
+  const chip = (href,label,title) => `<a href="${esc(href)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(title)}" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #dde3e9;border-radius:20px;padding:2px 8px;font:600 10.5px 'Helvetica Neue',Helvetica,sans-serif;color:#3f4a58;text-decoration:none">${label}</a>`;
+  if (a.website) chips.push(chip(a.website,'🌐 Site',a.website));
+  if (a.landing_page) chips.push(chip(a.landing_page,'📄 Landing',a.landing_page));
+  const s = a.socials||{};
+  if (s.instagram) chips.push(chip(s.instagram,'IG','Instagram'));
+  if (s.facebook) chips.push(chip(s.facebook,'FB','Facebook'));
+  if (s.google) chips.push(chip(s.google,'G','Google Business'));
+  return chips.length ? `<div style="display:flex;gap:5px;flex-wrap:wrap">${chips.join('')}</div>` : '';
+}
 function statCard(label, tip, value, sub, foot){
   return `<div style="background:#fff;padding:14px 15px">
     <div style="display:flex;align-items:center;gap:5px"><span style="font-size:11.5px;color:#6b7684">${label}</span>${infoI(tip)}</div>
@@ -388,7 +391,7 @@ function listView(){
 <td>
 <div style="display:flex;align-items:center;gap:10px">
 <span style="width:30px;height:30px;border-radius:50%;background:#e8f7ee;color:#0f5c2e;display:flex;align-items:center;justify-content:center;font:600 11px 'Helvetica Neue',Helvetica,sans-serif;flex:none">${esc(initials)}</span>
-<div><a href="#" style="font-weight:600" onclick="event.stopPropagation();app.openAffiliate('${a.id}')">${esc(a.name)}</a><div style="font-size:11px;color:#8c96a2">${esc(a.contact||'')}</div></div>
+<div><a href="#" style="font-weight:600" onclick="event.stopPropagation();app.openAffiliate('${a.id}')">${esc(a.name)}</a><div style="font-size:11px;color:#8c96a2">${esc(a.contact||'')}</div>${webLinks(a)?`<div style="margin-top:3px">${webLinks(a)}</div>`:''}</div>
 </div>
 </td>
 <td class="mut">Local Business Partners</td>
@@ -479,6 +482,7 @@ function detailView(){
 <div style="margin-top:9px;display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:#3f4a58">
 <div>${a.agreement==='founding'?'Founding partner':'Standard partner'} · <a href="#">${esc(a.contact||'contact on file')}</a></div>
 <div style="color:#6b7684">${esc(a.location||'')}</div>
+${webLinks(a)?`<div style="margin-top:2px">${webLinks(a)}</div>`:''}
 </div>
 </div>
 <div style="display:flex;gap:6px;flex:none">
@@ -910,22 +914,8 @@ function payoutView(){
     return html;
   }).join('');
 
-  const corrections = monthEntries.filter(e=>!e.eligible || (e.note||'').toLowerCase().includes('reassigned'));
-  const correctionCards = corrections.map(e=>{
-    const c = M.byId[e.referred_client_id];
-    return `<div style="border:1px solid #f0dfb4;background:#fffdf7;border-radius:8px;padding:11px 13px;display:flex;align-items:flex-start;gap:12px">
-<div style="flex:1">
-<div style="font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif">${e.eligible?'Reassigned sale':'Removed entry'} · ${esc(c?c.display_name:'')} · ${fmtDate(e.sale_date)}</div>
-<div style="margin-top:3px;font-size:11.5px;color:#5b6673">${usd(e.amount)} — ${esc(e.note||'')}</div>
-</div>
-<button class="mini-btn" style="flex:none;padding:5px 10px">View</button>
-</div>`;
-  }).join('');
-
   const paid = p.status==='paid';
   return `<div style="max-width:1520px;margin:0 auto;display:flex;flex-direction:column;gap:14px">
-<button onclick="app.setView('detail')" style="align-self:flex-start;border:0;background:none;padding:0;font:600 12.5px 'Helvetica Neue',Helvetica,sans-serif;color:#1d6fe0;cursor:pointer">← Back to ${esc(M.aff.name)}</button>
-
 <section class="card" style="padding:18px 20px">
 <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
 <div>
@@ -967,10 +957,6 @@ ${p.notes?`<div style="margin-top:10px;font-size:11.5px;color:#8c96a2">${esc(p.n
 </table>
 </section>
 
-${correctionCards?`<section class="card" style="padding:16px 18px">
-<h2 class="h2-sm">Ledger corrections <span style="font-weight:400;color:#98a3af">${corrections.length}</span></h2>
-<div style="margin-top:12px;display:flex;flex-direction:column;gap:9px">${correctionCards}</div>
-</section>`:''}
 </div>`;
 }
 
