@@ -321,7 +321,7 @@ const app = {
     if (!receiver.includes('@')){ state.payMsg = {kind:'err', text:"Enter the affiliate's PayPal email."}; return renderOverlays(); }
     state.payBusy = true; state.payMsg = null; renderOverlays();
     try {
-      const res = await callFn('paypal-payout', {payout_ids: ids, receiver});
+      const res = await callFn('payments-send', {payout_ids: ids, receiver});
       if (receiver !== M.aff.paypal_email) await supabase.from('aff_affiliates').update({paypal_email: receiver}).eq('id', M.aff.id);
       state.payBusy = false;
       state.payMsg = {kind:'ok', text:`Sent $${res.total} via PayPal (${res.env}) — batch ${res.paypal_batch_id}. Records updated.`};
@@ -335,7 +335,7 @@ const app = {
   },
   async syncPaypal(){
     state.syncOpen = true; state.syncData = null; state.syncMsg = 'Loading PayPal activity…'; renderOverlays();
-    try { const res = await callFn('paypal-sync', {}); state.syncData = res; state.syncMsg = null; }
+    try { const res = await callFn('payments-activity', {}); state.syncData = res; state.syncMsg = null; }
     catch(e){ state.syncMsg = e.message; }
     renderOverlays();
   },
