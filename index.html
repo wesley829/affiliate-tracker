@@ -341,6 +341,15 @@ const app = {
     renderOverlays();
   },
   closeSync(){ state.syncOpen = false; renderOverlays(); },
+  async syncGhl(){
+    const btn = document.getElementById('ghl-sync-btn');
+    if (btn){ btn.disabled = true; btn.textContent = 'Syncing…'; }
+    try {
+      const res = await callFn('crm-sync', {});
+      DATA = await loadData(); M = buildModel(DATA, state.affiliateId); render();
+      alert(`GoHighLevel sync: matched ${res.matched} of ${res.total} affiliates.`);
+    } catch(e){ alert(e.message); }
+  },
   async markPaid(id){
     if (!confirm('Mark this payout as paid (manually recorded, outside PayPal)?')) return;
     const today = nyDay(Date.now());
@@ -383,6 +392,7 @@ function listView(){
 <div class="filterbar">
 <div class="searchbox" style="width:300px"><span class="search-dot"></span><input placeholder="Search affiliates" oninput="filterRows(this)"></div>
 <div style="flex:1"></div>
+<button class="btn" id="ghl-sync-btn" onclick="app.syncGhl()">Sync GHL</button>
 <button class="btn" onclick="app.refresh()">Refresh</button>
 </div>
 <div style="overflow-x:auto">
@@ -790,8 +800,9 @@ function emptyView(){
 <div style="display:flex;gap:10px;align-items:center"><span class="live-dot"></span><strong>CardPointe</strong><span style="color:#6b7684">— ${liveCount} transactions tracked for matched clients</span></div>
 <div style="display:flex;gap:10px;align-items:center"><span class="live-dot"></span><strong>Practice Fusion</strong><span style="color:#6b7684">— ${matched} of ${M.clients.length} clients matched</span></div>
 <div style="display:flex;gap:10px;align-items:center"><span style="width:6px;height:6px;border-radius:50%;background:#c7d0d8"></span><strong>PayPal</strong><span style="color:#6b7684">— add secrets in Supabase to activate</span><button class="btn" style="padding:4px 9px;font-size:11.5px" onclick="app.syncPaypal()">Test connection</button></div>
+<div style="display:flex;gap:10px;align-items:center"><span style="width:6px;height:6px;border-radius:50%;background:#c7d0d8"></span><strong>GoHighLevel</strong><span style="color:#6b7684">— pulls affiliate phone / website / socials</span><button class="btn" style="padding:4px 9px;font-size:11.5px" onclick="app.syncGhl()">Sync now</button></div>
 </div>
-<div style="margin-top:14px;font-size:11.5px;color:#8c96a2;line-height:1.7">PayPal setup: Supabase Dashboard → Edge Functions → Secrets → <code>PAYPAL_CLIENT_ID</code>, <code>PAYPAL_CLIENT_SECRET</code>, <code>PAYPAL_ENV</code> (<code>sandbox</code> or <code>live</code>).<br>Client data is PHI — keep it inside this app.</div>
+<div style="margin-top:14px;font-size:11.5px;color:#8c96a2;line-height:1.7">PayPal setup: Supabase Dashboard → Edge Functions → Secrets → <code>PAYPAL_CLIENT_ID</code>, <code>PAYPAL_CLIENT_SECRET</code>, <code>PAYPAL_ENV</code> (<code>sandbox</code> or <code>live</code>).<br>GoHighLevel setup: same screen → <code>GHL_PRIVATE_TOKEN</code>.<br>Client data is PHI — keep it inside this app.</div>
 </section>
 </div>`;
 }
