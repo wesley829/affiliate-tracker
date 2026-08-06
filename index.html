@@ -129,8 +129,8 @@ a:hover{color:#1558b0;text-decoration:underline}
 <header style="flex:none;background:#fff;border-bottom:1px solid #e4e8ed;padding:0 26px;display:flex;align-items:center;gap:26px;height:52px">
 <span style="font:600 15px 'Helvetica Neue',Helvetica,sans-serif">Premier Solutions · Affiliate Manager</span>
 <div style="display:flex;gap:20px;font-size:13px;color:#5b6673">
-<a href="#" style="color:#5b6673;padding:16px 0">Dashboard</a>
-<button class="topnav-btn" id="nav-detail" onclick="app.setView('detail')">Affiliates</button>
+<button class="topnav-btn" id="nav-detail" onclick="app.setView('detail')">Dashboard</button>
+<button class="topnav-btn" id="nav-list" onclick="app.setView('list')">Affiliates</button>
 <button class="topnav-btn" id="nav-payout" onclick="app.setView('payout')">Payouts</button>
 <button class="topnav-btn" id="nav-empty" onclick="app.setView('empty')">Sync status</button>
 <a href="#" style="color:#5b6673;padding:16px 0">Settings</a>
@@ -213,20 +213,20 @@ async function fetchAll(table, columns, applyFilters = (q) => q) {
 }
 
 /* ---------------- state + data model ---------------- */
-const state = {view:'detail', tab:'customers', openRows:{}, openContrib:{}, drawer:null, confirm:false,
+const state = {view:'list', tab:'customers', affiliateId:null, openRows:{}, openContrib:{}, drawer:null, confirm:false,
   payOpen:false, payBusy:false, payMsg:null, payReceiver:null, syncOpen:false, syncData:null, syncMsg:null};
 let userEmail = '';
+let DATA = null; // raw rows for all affiliates, cached between renders
 let M = null; // computed model, built in buildModel()
 
 async function loadData(){
-  const [affs] = await Promise.all([ fetchAll('aff_affiliates','*') ]);
+  const affs = await fetchAll('aff_affiliates','*');
   if (!affs.length) throw new Error('No affiliates found');
-  const aff = affs.find(a=>a.code==='DD') || affs[0];
   const [clients, ledger, payouts, audit] = await Promise.all([
-    fetchAll('aff_referred_clients','*', q=>q.eq('affiliate_id',aff.id)),
-    fetchAll('aff_ledger_entries','*', q=>q.eq('affiliate_id',aff.id)),
-    fetchAll('aff_payouts','*', q=>q.eq('affiliate_id',aff.id)),
-    fetchAll('aff_audit_log','*', q=>q.eq('affiliate_id',aff.id))
+    fetchAll('aff_referred_clients','*'),
+    fetchAll('aff_ledger_entries','*'),
+    fetchAll('aff_payouts','*'),
+    fetchAll('aff_audit_log','*')
   ]);
 
   // Live CardPointe revenue for matched patients (Premier only; draft rows are deprecated double-counts)
@@ -236,11 +236,32 @@ async function loadData(){
     live = await fetchAll('dashboard_transactions','id,patient_id,amount,transaction_date,source', q=>
       q.eq('business_id', PREMIER_BUSINESS_ID).eq('source','cardpointe').in('patient_id', patientIds));
   }
-  return {aff, clients, ledger, payouts, audit, live};
+  return {affs, clients, ledger, payouts, audit, live};
 }
 
-function buildModel(D){
-  const {aff, clients, ledger, payouts, audit, live} = D;
+function buildModel(D, affId){
+  const curKey = nyDay(Date.now()).slice(0,7);
+  // Per-affiliate roster summaries (for the Affiliates list view)
+  const summaries = D.affs.map(a=>{
+    const cs = D.clients.filter(c=>c.affiliate_id===a.id);
+    const ps = D.payouts.filter(p=>p.affiliate_id===a.id);
+    const gross = ps.reduce((s,p)=>s+Number(p.gross),0);
+    const owed = ps.filter(p=>['approved','pending_review','scheduled','held'].includes(p.status)).reduce((s,p)=>s+Number(p.commission),0);
+    const paid = ps.filter(p=>p.status==='paid').reduce((s,p)=>s+Number(p.commission),0);
+    const pats = new Set(cs.filter(c=>c.status==='active'&&c.patient_id).map(c=>c.patient_id));
+    const liveGross = D.live.filter(t=>pats.has(t.patient_id) && nyDay(t.transaction_date).slice(0,7)===curKey).reduce((s,t)=>s+Number(t.amount),0);
+    const tier = tierFor(a.tier_schedule, liveGross);
+    return {aff:a, clients:cs.length, active:cs.filter(c=>c.status==='active').length, gross, owed, paid, liveGross, tier};
+  }).sort((a,b)=> (b.gross+b.paid) - (a.gross+a.paid) || a.aff.name.localeCompare(b.aff.name));
+
+  // Selected affiliate (Dashboard) — default to the first with activity
+  const aff = D.affs.find(x=>x.id===affId) || D.affs.find(x=>x.code==='DD') || D.affs[0];
+  const clients = D.clients.filter(c=>c.affiliate_id===aff.id);
+  const ledger = D.ledger.filter(e=>e.affiliate_id===aff.id);
+  const payouts = D.payouts.filter(p=>p.affiliate_id===aff.id);
+  const audit = D.audit.filter(x=>x.affiliate_id===aff.id);
+  const affPats = new Set(clients.filter(c=>c.patient_id).map(c=>c.patient_id));
+  const live = D.live.filter(t=>affPats.has(t.patient_id));
   const schedule = aff.tier_schedule;
   const byId = Object.fromEntries(clients.map(c=>[c.id,c]));
   const rateByMonth = {}; payouts.forEach(p=>{ rateByMonth[monthKey(p.sale_month)] = Number(p.rate)||0; });
@@ -292,7 +313,8 @@ function buildModel(D){
   const sortedPayouts = [...payouts].sort((a,b)=>b.sale_month.localeCompare(a.sale_month));
   const reviewPayout = sortedPayouts[0] || null;
 
-  return {aff, clients, ledger, payouts:sortedPayouts, audit:[...audit].sort((a,b)=>b.at.localeCompare(a.at)), live,
+  return {affiliates:D.affs, summaries,
+    aff, clients, ledger, payouts:sortedPayouts, audit:[...audit].sort((a,b)=>b.at.localeCompare(a.at)), live,
     schedule, rateByMonth, byId, clientAgg, liveByClient, monthly, monthlyExcl, nowKey,
     curGross, curTier, curEst, totalGross, totalPaid, totalOwed, lastPaidDate, reviewPayout};
 }
@@ -300,6 +322,7 @@ function buildModel(D){
 /* ---------------- app actions ---------------- */
 const app = {
   setView(v){ state.view = v; render(); },
+  openAffiliate(id){ state.affiliateId = id; state.tab='customers'; state.openRows={}; state.openContrib={}; M = buildModel(DATA, id); state.view = 'detail'; render(); },
   setTab(t){ state.tab = t; render(); },
   toggleRow(i){ state.openRows[i] = !state.openRows[i]; render(); },
   toggleContrib(i){ state.openContrib[i] = !state.openContrib[i]; render(); },
@@ -308,7 +331,7 @@ const app = {
   openConfirm(){ state.confirm = true; renderOverlays(); },
   closeConfirm(){ state.confirm = false; renderOverlays(); },
   async signOut(){ await supabase.auth.signOut(); location.reload(); },
-  async refresh(){ document.getElementById('header-status').textContent='Refreshing…'; M = buildModel(await loadData()); render(); setHeaderStatus(); },
+  async refresh(){ document.getElementById('header-status').textContent='Refreshing…'; DATA = await loadData(); M = buildModel(DATA, state.affiliateId); render(); setHeaderStatus(); },
 
   /* ---- PayPal payout flow ---- */
   openPay(){ state.payOpen = true; state.payMsg = null; state.payBusy = false; renderOverlays(); },
@@ -326,7 +349,7 @@ const app = {
       state.payBusy = false;
       state.payMsg = {kind:'ok', text:`Sent $${res.total} via PayPal (${res.env}) — batch ${res.paypal_batch_id}. Records updated.`};
       renderOverlays();
-      M = buildModel(await loadData()); render();
+      DATA = await loadData(); M = buildModel(DATA, state.affiliateId); render();
     } catch(e){
       state.payBusy = false;
       state.payMsg = {kind:'err', text:e.message};
@@ -355,6 +378,79 @@ function setHeaderStatus(){
   document.getElementById('header-status').innerHTML = `<span class="live-dot">Live · CardPointe via Glow platform</span>`;
 }
 
+/* ---------------- affiliates roster (list view) ---------------- */
+function listView(){
+  const rows = M.summaries.map(s=>{
+    const a = s.aff;
+    const initials = a.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    return `<tr class="row clickable" onclick="app.openAffiliate('${a.id}')">
+<td style="width:36px"><input type="checkbox" onclick="event.stopPropagation()" style="margin:0"></td>
+<td>
+<div style="display:flex;align-items:center;gap:10px">
+<span style="width:30px;height:30px;border-radius:50%;background:#e8f7ee;color:#0f5c2e;display:flex;align-items:center;justify-content:center;font:600 11px 'Helvetica Neue',Helvetica,sans-serif;flex:none">${esc(initials)}</span>
+<div><a href="#" style="font-weight:600" onclick="event.stopPropagation();app.openAffiliate('${a.id}')">${esc(a.name)}</a><div style="font-size:11px;color:#8c96a2">${esc(a.contact||'')}</div></div>
+</div>
+</td>
+<td class="mut">Local Business Partners</td>
+<td class="mut">${a.agreement==='founding'?'Founding · signed tiers':'Standard schedule'}</td>
+<td style="text-align:right">${s.clients}</td>
+<td style="text-align:right">${s.active}</td>
+<td class="num">${usd(s.gross + s.liveGross)}</td>
+<td class="num" style="${s.owed>0?'color:#8a5a06;font-weight:600':''}">${usd(s.owed)}</td>
+<td class="num" style="${s.paid>0?'color:#0f5c2e;font-weight:600':''}">${usd(s.paid)}</td>
+<td>${s.tier?badge('ok', s.tier.tier+' · '+Math.round(s.tier.rate*100)+'%'):(s.gross>0?badge('grey','No sales this month'):'<span style="color:#c7d0d8">—</span>')}</td>
+<td style="width:36px"><button class="icon-btn" onclick="event.stopPropagation()" style="font-weight:700;border:0">⋮</button></td>
+</tr>`;
+  }).join('');
+  const totals = M.summaries.reduce((t,s)=>({gross:t.gross+s.gross+s.liveGross, owed:t.owed+s.owed, paid:t.paid+s.paid, clients:t.clients+s.clients}),{gross:0,owed:0,paid:0,clients:0});
+
+  return `<div style="max-width:1520px;margin:0 auto;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+<h1 style="margin:0;font:600 21px 'Helvetica Neue',Helvetica,sans-serif;letter-spacing:-.01em">Affiliates</h1>
+<div style="flex:1"></div>
+<div class="chip"><span style="color:#6b7684">Start Date</span><span style="color:#b6c0cb">→</span><span style="color:#6b7684">End Date</span></div>
+<button class="btn">Export</button>
+<button class="btn-primary" style="padding:8px 16px">+ Add</button>
+</div>
+
+<section class="card">
+<div class="filterbar" style="border-bottom:1px solid #eef1f4">
+<div class="searchbox" style="width:300px"><span class="search-dot"></span><input placeholder="Search by affiliate name and email"></div>
+<select class="sel"><option>Agreement: All</option><option>Founding</option><option>Standard</option></select>
+<select class="sel"><option>Status: All</option><option>Active</option><option>Inactive</option></select>
+<div style="flex:1"></div>
+<button class="btn">Filters</button>
+</div>
+<div style="overflow-x:auto">
+<table class="tbl" style="min-width:1300px">
+<thead><tr>
+<th style="width:36px"><input type="checkbox" style="margin:0"></th>
+<th style="min-width:230px">Affiliate Name</th>
+<th>Campaign</th>
+<th>Agreement</th>
+<th class="num">Referred Clients</th>
+<th class="num">Active</th>
+<th class="num">Revenue</th>
+<th class="num">Owed</th>
+<th class="num">Paid</th>
+<th>Tier · ${monthLabel(M.nowKey)}</th>
+<th style="width:36px"></th>
+</tr></thead>
+<tbody>${rows}</tbody>
+</table>
+</div>
+<div style="display:flex;gap:26px;padding:11px 20px;font-size:12px;color:#6b7684;border-top:1px solid #eef1f4;flex-wrap:wrap">
+<span>${M.summaries.length} affiliates · ${totals.clients} referred clients</span>
+<span>Revenue: <strong style="color:#111a26">${usd(totals.gross)}</strong></span>
+<span>Owed: <strong style="color:#8a5a06">${usd(totals.owed)}</strong></span>
+<span>Paid: <strong style="color:#0f5c2e">${usd(totals.paid)}</strong></span>
+</div>
+</section>
+
+<div style="font-size:11.5px;color:#8c96a2">Click an affiliate to open their dashboard. Revenue and tiers come from the commission ledger plus live CardPointe activity for matched referred clients.</div>
+</div>`;
+}
+
 /* ---------------- detail view ---------------- */
 function detailView(){
   const a = M.aff;
@@ -369,7 +465,7 @@ function detailView(){
 
   return `<div style="max-width:1520px;margin:0 auto;display:flex;flex-direction:column;gap:14px">
 
-<a href="#" style="font-size:12.5px;font-weight:600">← Back to Affiliates</a>
+<a href="#" onclick="app.setView('list');return false" style="font-size:12.5px;font-weight:600">← Back to Affiliates</a>
 
 <div style="display:grid;grid-template-columns:390px 1fr;gap:14px;align-items:stretch">
 
@@ -1021,10 +1117,12 @@ ${body}
 function render(){
   if (!M) return;
   document.getElementById('nav-detail').className = 'topnav-btn' + (state.view==='detail' ? ' on' : '');
+  document.getElementById('nav-list').className = 'topnav-btn' + (state.view==='list' ? ' on' : '');
   document.getElementById('nav-payout').className = 'topnav-btn' + (state.view==='payout' ? ' on' : '');
   document.getElementById('nav-empty').className = 'topnav-btn' + (state.view==='empty' ? ' on' : '');
   const main = document.getElementById('main');
-  if (state.view==='detail') main.innerHTML = detailView();
+  if (state.view==='list') main.innerHTML = listView();
+  else if (state.view==='detail') main.innerHTML = detailView();
   else if (state.view==='payout') main.innerHTML = payoutView();
   else main.innerHTML = emptyView();
 }
@@ -1043,7 +1141,9 @@ async function enterApp(session){
   document.getElementById('avatar').title = email;
   document.getElementById('main').innerHTML = '<div style="padding:40px;color:#6b7684;font-size:13px">Loading live data…</div>';
   try {
-    M = buildModel(await loadData());
+    DATA = await loadData();
+    M = buildModel(DATA, state.affiliateId);
+    state.affiliateId = M.aff.id;
     render();
     setHeaderStatus();
   } catch (err){
